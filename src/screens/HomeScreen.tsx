@@ -1,17 +1,26 @@
 // screens/HomeScreen.tsx
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Image, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import SidebarMenu from '../components/SidebarMenu';
 
-const HomeScreen: React.FC = () => {
+const { width, height } = Dimensions.get('window');
+
+
+interface HomeScreenProps {
+  navigation: DrawerNavigationProp<any>;
+}
+
+const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 150 }}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Trường Đại Học Thủ Dầu Một</Text>
-        <View style={styles.headerIcons}>
-          <Icon name="bell" size={20} color="#fff" style={styles.icon} />
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
           <Icon name="bars" size={20} color="#fff" />
-        </View>
+        </TouchableOpacity>
+        <Text style={styles.greeting}>Trường Đại Học Thủ Dầu Một</Text>
+        <Icon name="bell" size={20} color="#fff" style={styles.notiIcon} />
       </View>
 
       <View style={styles.searchContainer}>
@@ -78,7 +87,6 @@ const HomeScreen: React.FC = () => {
           </View>
         ))}
       </View>
-
     </ScrollView>
   );
 };
@@ -89,131 +97,123 @@ const styles = StyleSheet.create({
     backgroundColor: '#f2f2f2',
   },
   header: {
-    padding: 20,
+    padding: width * 0.05,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: "#000066", 
-    marginTop: 22,
+    marginTop: height * 0.06,
   },
   greeting: {
-    fontSize: 20,
+    fontSize: width * 0.05,
     fontWeight: 'bold',
     color: "#fff"
-    
   },
   headerIcons: {
     flexDirection: 'row',
   },
-  icon: {
-    marginRight: 15,
+  notiIcon: {
+    marginRight: width * 0.04,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    margin: 20,
-    paddingHorizontal: 15,
+    margin: width * 0.05,
+    paddingHorizontal: width * 0.04,
     backgroundColor: '#fff',
     borderRadius: 10,
     elevation: 2,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
-    paddingVertical: 10,
+    fontSize: width * 0.04,
+    paddingVertical: height * 0.015,
   },
   searchIcon: {
-    marginLeft: 10,
+    marginLeft: width * 0.02,
   },
   bannerContainer: {
     alignItems: 'center',
-    marginVertical: 10,
+    marginVertical: height * 0.02,
   },
   banner: {
     width: '90%',
-    padding: 20,
+    padding: width * 0.05,
     backgroundColor: '#ffecf0',
     borderRadius: 15,
     alignItems: 'center',
   },
   discountText: {
-    fontSize: 12,
+    fontSize: width * 0.03,
     color: '#ff6347',
     fontWeight: 'bold',
     alignSelf: 'flex-start',
   },
   bannerTitle: {
-    fontSize: 24,
+    fontSize: width * 0.06,
     fontWeight: 'bold',
     color: '#000',
   },
   bannerSubtitle: {
-    fontSize: 14,
+    fontSize: width * 0.04,
     color: '#666',
   },
   sectionContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginHorizontal: 20,
-    marginTop: 20,
+    marginHorizontal: width * 0.05,
+    marginTop: height * 0.03,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: width * 0.045,
     fontWeight: 'bold',
   },
   seeAll: {
-    fontSize: 14,
+    fontSize: width * 0.04,
     color: '#3F51B5',
   },
   subjectsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginVertical: 10,
+    marginVertical: height * 0.02,
   },
   subject: {
     alignItems: 'center',
-    padding: 10,
+    padding: width * 0.03,
     backgroundColor: '#3F51B5',
     borderRadius: 10,
-    width: 80,
+    width: width * 0.2,
   },
   subjectText: {
     color: '#fff',
-    marginTop: 5,
+    marginTop: height * 0.01,
   },
   coursesContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 10,
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: width * 0.05,
   },
   courseCard: {
-    width: 120,
-    backgroundColor: '#fff',
+    width: '48%',
+    marginVertical: height * 0.01,
     borderRadius: 10,
-    padding: 10,
-    alignItems: 'center',
+    overflow: 'hidden',
+    backgroundColor: '#fff',
+    elevation: 2,
   },
   courseImage: {
     width: '100%',
-    height: 80,
-    borderRadius: 8,
+    height: height * 0.15,
   },
   courseTitle: {
-    fontSize: 14,
+    padding: width * 0.03,
+    fontSize: width * 0.04,
     fontWeight: 'bold',
-    marginTop: 5,
-  },
-  coursePrice: {
-    fontSize: 14,
-    color: '#FF6347',
-    marginTop: 5,
-  },
-  courseIcon: {
-    position: 'absolute', 
-    top: 10,
-    left: 10,
+    color: '#333',
   },
 });
+
 
 export default HomeScreen;

@@ -7,7 +7,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 
 type NotificationsScreenProps = StackScreenProps<RootStackParamList, 'NotificationsScreen'>;
 
-const NotificationsScreen: React.FC = () => {
+const NotificationScreen: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -110,4 +110,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NotificationsScreen;
+export default NotificationScreen;

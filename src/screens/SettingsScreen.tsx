@@ -12,9 +12,7 @@ const SettingsScreen: React.FC = () => {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.username}>Trường đại học Thủ Dầu Một</Text>
-      </View>s
-      
-      
+      </View>
     </ScrollView>
   );
 };
