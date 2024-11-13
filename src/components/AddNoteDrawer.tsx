@@ -1,23 +1,28 @@
-// AddNoteScreen.tsx
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
 import { useNoteStore } from '../store/noteStore';
 import { useNavigation } from '@react-navigation/native';
 
 const AddNoteDrawer: React.FC = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [notes, setNotes] = useState('');
   const addNote = useNoteStore((state) => state.addNote);
   const navigation = useNavigation();
 
   const handleSave = () => {
+    if (!title.trim() || !content.trim()) {
+      Alert.alert("Error", "Please fill the Title và Content.");
+      return;
+    }
+
     addNote({
       id: Math.random().toString(),
       title,
       content,
-      notes,
+      notes: '',
     });
+
+    Alert.alert("Success", "Note created successfully.");
     navigation.goBack();
   };
 
@@ -42,14 +47,6 @@ const AddNoteDrawer: React.FC = () => {
         multiline
         value={content}
         onChangeText={setContent}
-      />
-      <TextInput
-        style={styles.notesInput}
-        placeholder="Notes"
-        placeholderTextColor="#aaa"
-        multiline
-        value={notes}
-        onChangeText={setNotes}
       />
     </View>
   );
@@ -82,13 +79,7 @@ const styles = StyleSheet.create({
     color: '#000',
     marginBottom: 10,
     flex: 1,
-    textAlignVertical: 'top', // Để nội dung bắt đầu từ trên cùng khi multiline
-  },
-  notesInput: {
-    fontSize: 16,
-    color: '#000',
-    marginTop: 10,
-    textAlignVertical: 'top', // Để nội dung bắt đầu từ trên cùng khi multiline
+    textAlignVertical: 'top',
   },
 });
 

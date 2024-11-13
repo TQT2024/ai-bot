@@ -1,4 +1,3 @@
-// AppNavigator.tsx
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -13,6 +12,7 @@ import BottomMenuBar from '../components/BottomMenuBar';
 import AddNoteDrawer from '../components/AddNoteDrawer';
 import AddCalendarDrawer from '../components/AddCalendarDrawer';
 import NotesListScreen from '../screens/NotesListScreen';
+import NoteDetailScreen from '../screens/NoteDetailScreen';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -22,6 +22,9 @@ export type RootStackParamList = {
     screen: 'Home' | 'Settings' | 'Add' | 'Notifications' | 'Profile' |
      'AddNoteDrawer' | 'AddCalendarDrawer' | 'NotesListScreen';
   };
+  NoteStack: {
+    screen: 'NotesListScreen' | 'NoteDetailScreen';
+  };
   Home: undefined;
   Settings: undefined;
   Add: undefined;
@@ -30,6 +33,8 @@ export type RootStackParamList = {
   AddNoteDrawer: undefined;
   AddCalendarDrawer: undefined;
   NotesListScreen: undefined;
+  NoteDetailScreen: { noteId: string };
+
 };
 
 const HomeStack = () => (
@@ -67,10 +72,29 @@ const HomeStack = () => (
           presentation: 'modal',
         }}
       />
-      
     </Stack.Navigator>
     <BottomMenuBar />
   </>
+);
+
+const NotesStack = () => (
+  <Stack.Navigator
+    screenOptions={{
+      headerTitleAlign: 'center',
+    }}
+    initialRouteName="NotesListScreen"
+  >
+    <Stack.Screen
+      name="NotesListScreen"
+      component={NotesListScreen}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="NoteDetailScreen"
+      component={NoteDetailScreen}
+      options={{ headerShown: false }}
+    />
+  </Stack.Navigator>
 );
 
 const AppNavigator = () => {
@@ -85,7 +109,15 @@ const AppNavigator = () => {
         }}
       >
         <Drawer.Screen name="HomeStack" component={HomeStack} />
-        <Stack.Screen name="NotesListScreen" component={NotesListScreen} options={{ title: 'Quản lý ghi chú' }} />
+        <Drawer.Screen name="NoteStack" component={NotesStack} />
+        <Stack.Screen name="NotesListScreen" component={NotesListScreen} options={{ headerShown: false }} />
+        <Stack.Screen
+        name="NoteDetailScreen"
+        component={NoteDetailScreen}
+        options={{ 
+          headerShown: false,
+        }}
+      />
       </Drawer.Navigator>
     </NavigationContainer>
   );

@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 type RootStackParamList = {
   NotesListScreen: undefined;
   AddNoteScreen: undefined;
+  NoteDetailScreen: { noteId: string };
 };
 
 type NotesListScreenNavigationProp = DrawerNavigationProp<RootStackParamList, 'NotesListScreen'>;
@@ -33,11 +34,15 @@ const NotesListScreen: React.FC = () => {
         data={notes}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.noteItem}>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.content}>{item.content}</Text>
-            <Text style={styles.notes}>{item.notes}</Text>
-          </View>
+          <TouchableOpacity 
+            onPress={ () => navigation.navigate('NoteDetailScreen', { noteId: item.id }) }
+          >
+            <View style={styles.noteItem}>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.content}>{item.content}</Text>
+              <Text style={styles.notes}>{item.notes}</Text>
+            </View>
+          </TouchableOpacity>
         )}
         contentContainerStyle={{ paddingBottom: 20 }}
       />

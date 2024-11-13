@@ -5,7 +5,6 @@ const AddCalendarDrawer = () => {
   return (
     <View style={styles.container}>
       <Text>Thêm Sự Kiện</Text>
-      {/* Các trường và logic để thêm sự kiện */}
     </View>
   );
 };

@@ -1,4 +1,3 @@
-// screens/HomeScreen.tsx
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Image, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';

@@ -1,4 +1,3 @@
-// screens/Home.tsx
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -17,12 +16,11 @@ const ChatScreen = ({ navigation }: ChatScreenProps) => {
       <View style={styles.cardContainer}>
         <TouchableOpacity 
           style={[styles.card, { backgroundColor: '#FFB74D' }]}
-          onPress={() => navigation.navigate('ChatScreen')} // Chuyển đến màn hình khác
+          onPress={() => navigation.navigate('ChatScreen')}
         >
           <Icon name="plane" size={30} color="#fff" />
           <Text style={styles.cardText}>Tìm chuyến bay</Text>
         </TouchableOpacity>
-        {/* Các TouchableOpacity khác... */}
       </View>
 
       <View style={styles.promotionContainer}>

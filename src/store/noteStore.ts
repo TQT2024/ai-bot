@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type Note = {
+export type Note = {
   id: string;
   title: string;
   content: string;
@@ -21,7 +21,7 @@ export const useNoteStore = create<NoteStore>((set) => ({
   notes: [],
   addNote: (newNote) =>
     set((state) => {
-      const updatedNotes = [...state.notes, newNote];
+      const updatedNotes = [newNote, ...state.notes].slice(0, 10);
       AsyncStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(updatedNotes));
       return { notes: updatedNotes };
     }),
@@ -40,4 +40,3 @@ export const useNoteStore = create<NoteStore>((set) => ({
     }
   },
 }));
-
