@@ -10,8 +10,14 @@ const AddNoteDrawer: React.FC = () => {
   const navigation = useNavigation();
 
   const handleSave = () => {
-    if (!title.trim() || !content.trim()) {
+    if (!title.trim() && !content.trim()) {
       Alert.alert("Error", "Please fill the Title và Content.");
+      return;
+    } else if (!title.trim()) { 
+      Alert.alert("Error", "Please fill the Title.");
+      return;
+    } else if (!content.trim()) {
+      Alert.alert("Error", "Please fill the Content.");
       return;
     }
 
@@ -20,6 +26,7 @@ const AddNoteDrawer: React.FC = () => {
       title,
       content,
       notes: '',
+      timestamp: Date.now(),
     });
 
     Alert.alert("Success", "Note created successfully.");

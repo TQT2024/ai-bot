@@ -17,7 +17,6 @@ const SidebarMenu: React.FC<DrawerContentComponentProps> = (props) => {
       {[
         { title: "Quản lý ghi chú", icon: "pencil", screen: "NotesListScreen" },
         { title: "Quản lý chi tiêu", icon: "dollar" },
-        { title: "Quản lý thời gian", icon: "clock-o" },
         { title: "Quản lý lịch trong ngày", icon: "calendar" },
         { title: "Sự kiện quan trọng", icon: "calendar-check-o" },
         { title: "Quản lý âm thanh", icon: "music" },

@@ -3,7 +3,7 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { RootStackParamList } from '../navigator/AppNavigator';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
 type HomeStackNavigationProp = DrawerNavigationProp<RootStackParamList, 'HomeStack'>;
 

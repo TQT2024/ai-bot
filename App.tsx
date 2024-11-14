@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import * as Font from 'expo-font';
-import AppNavigator from './src/navigator/AppNavigator';
+import AppNavigator from './src/navigation/AppNavigator';
 
 export default function App() {
   const [fontLoaded, setFontLoaded] = useState(false);

@@ -2,21 +2,32 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../store/types';
+import { RootStackParamList } from '../types/types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNoteStore } from '../store/noteStore';
+import useCalendarStore from '../store/calendarStore';
 
 type AddScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddScreen'>;
 
 const AddScreen = () => {
   const navigation = useNavigation<AddScreenNavigationProp>();
   const notes = useNoteStore((state) => state.notes);
+  const events = useCalendarStore((state) => state.events);
+
+  const combinedData = [
+    ...notes.map((note) => ({ type: 'note', title: `Note added: ${note.title}`, id: note.id, createdTime: note.timestamp })),
+    ...events.map((event) => ({ type: 'event', title: `Event added: ${event.title}`, id: event.id, createdTime: event.timestamp })),
+  ]
+
+  // FILO
+  .sort((a, b) => b.createdTime - a.createdTime)
+  .slice(0, 10);
 
   return (
     <View style={styles.container}>
       <View style={styles.topSection}>
         <TouchableOpacity
-          style={[styles.card, { backgroundColor: '#4CAF50' }]}
+          style={[styles.card, { backgroundColor: '#0171C6' }]}
           onPress={() => navigation.navigate({ name: 'AddNoteDrawer', params: { note: undefined } })}
         >
           <Icon name="sticky-note" size={30} color="#fff" />
@@ -24,7 +35,7 @@ const AddScreen = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.card, { backgroundColor: '#FF6347' }]}
+          style={[styles.card, { backgroundColor: '#0171C6' }]}
           onPress={() => navigation.navigate({ name: 'AddCalendarDrawer', params: undefined })}
         >
           <Icon name="calendar" size={30} color="#fff" />
@@ -35,11 +46,11 @@ const AddScreen = () => {
       <View style={styles.bottomSection}>
         <Text style={styles.modalTitle}></Text>
         <FlatList
-          data={notes}
+          data={combinedData}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.noteItem}>
-              <Text style={styles.noteTitle}>Note added: {item.title}</Text>
+              <Text style={styles.noteTitle}>{item.title}</Text>
             </View>
           )}
         />
@@ -57,7 +68,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    
     backgroundColor: '#f2f2f2',
     paddingVertical: 20,
   },
@@ -67,7 +77,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    top: 20
+    top: 20,
   },
   cardText: {
     color: '#fff',
@@ -79,6 +89,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingTop: 20,
+    paddingBottom: 150,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },

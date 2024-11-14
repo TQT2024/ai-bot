@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { RootStackParamList } from '../store/types';
+import { RootStackParamList } from '../types/types';
 import { StackScreenProps } from '@react-navigation/stack';
 
 type ProfileScreenProps = StackScreenProps<RootStackParamList, 'ProfileScreen'>;

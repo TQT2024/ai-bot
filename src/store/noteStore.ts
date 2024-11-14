@@ -6,6 +6,7 @@ export type Note = {
   title: string;
   content: string;
   notes: string;
+  timestamp: number;
 };
 
 const NOTES_STORAGE_KEY = 'NOTES_STORAGE_KEY';
@@ -39,4 +40,5 @@ export const useNoteStore = create<NoteStore>((set) => ({
       set({ notes: JSON.parse(storedNotes) });
     }
   },
+  
 }));
