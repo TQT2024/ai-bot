@@ -30,6 +30,7 @@ const useCalendarStore = create<CalendarStore>()(
             const newEvent: CalendarEvent = {
                 ...eventData,
                 id: Date.now().toString(),
+                color: eventData.type === 'event' ? '#FFA500' : '#2196F3',
             };
 
             set((state) => ({
@@ -42,49 +43,47 @@ const useCalendarStore = create<CalendarStore>()(
             }
         },
 
-      updateEvent: async (updatedEvent) => {
-        try {
-          set({ isLoading: true, error: null });
-          set((state) => ({
-            events: state.events.map((event) =>
-              event.id === updatedEvent.id ? updatedEvent : event
-            ),
-            isLoading: false,
-          }));
-        } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-          set({ error: errorMessage, isLoading: false });
-        }
-      },
+        updateEvent: async (updatedEvent) => {
+          try {
+            set({ isLoading: true, error: null });
+            set((state) => ({
+              events: state.events.map((event) =>
+                event.id === updatedEvent.id ? updatedEvent : event
+              ),
+              isLoading: false,
+            }));
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+            set({ error: errorMessage, isLoading: false });
+          }
+        },
 
-      deleteEvent: async (eventId) => {
-        try {
-          set({ isLoading: true, error: null });
-          set((state) => ({
-            events: state.events.filter((event) => event.id !== eventId),
-            isLoading: false,
-          }));
-        } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-          set({ error: errorMessage, isLoading: false });
-        }
-      },
+        deleteEvent: async (eventId) => {
+          try {
+            set({ isLoading: true, error: null });
+            set((state) => ({
+              events: state.events.filter((event) => event.id !== eventId),
+              isLoading: false,
+            }));
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+            set({ error: errorMessage, isLoading: false });
+          }
+        },
 
-      
+        getEventsByDateRange: (startDate, endDate) => {
+          const { events } = get();
+          return events.filter((event) => {
+            const eventStart = new Date(event.startDate);
+            const eventEnd = new Date(event.endDate);
+            return eventStart >= startDate && eventEnd <= endDate;
+          });
+        },
 
-      getEventsByDateRange: (startDate, endDate) => {
-        const { events } = get();
-        return events.filter((event) => {
-          const eventStart = new Date(event.startDate);
-          const eventEnd = new Date(event.endDate);
-          return eventStart >= startDate && eventEnd <= endDate;
-        });
-      },
-
-      getEventsByType: (type) => {
-        const { events } = get();
-        return events.filter((event) => event.type === type);
-      },
+        getEventsByType: (type) => {
+          const { events } = get();
+          return events.filter((event) => event.type === type);
+        },
     }),
     {
       name: 'calendar-storage',
@@ -95,4 +94,3 @@ const useCalendarStore = create<CalendarStore>()(
 );
 
 export default useCalendarStore;
-  

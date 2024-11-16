@@ -11,15 +11,30 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "newArchEnabled": true,
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "assets/icon.png",
+          "color": "#ffffff",
+          "sounds": ["assets/mixkit-long-pop-2358.wav"]
+        }
+      ]
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anhtuatus.aibot"
+      "bundleIdentifier": "com.anhtuatus.aibot",
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "useNextNotificationsApi": true,
       "package": "com.anhtuatus.aibot"
     },
     "web": {

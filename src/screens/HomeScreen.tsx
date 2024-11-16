@@ -2,16 +2,40 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Image, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
-import SidebarMenu from '../components/SidebarMenu';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
 const { width, height } = Dimensions.get('window');
 
-
-interface HomeScreenProps {
-  navigation: DrawerNavigationProp<any>;
-}
+type HomeScreenProps = {
+  navigation: DrawerNavigationProp<any> & StackNavigationProp<RootStackParamList>;
+};
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+  const courses = [
+    {
+      id: '1',
+      title: 'Thông báo điều chỉnh thời gian đào tạo của sinh viên các khóa 2022 trở về trước',
+      icon: 'book',
+      imageUri: 'https://thanhnien.mediacdn.vn/Uploaded/linhnt-qc/2022_02_28/tn2-8506.jpg',
+      url: 'https://tdmu.edu.vn/tin-tuc/thong-tin-nghien-cuu/khai-mac-chuoi-su-kien-khoa-hoc-cong-nghe-va-doi-moi-sang-tao-tdmu-nam-2024',
+    },
+    {
+      id: '2',
+      title: 'Quyết định sửa đổi, bổ sung quyết định 1774/QĐ-ĐHTDM ngày 17/11/2021',
+      icon: 'laptop',
+      imageUri: 'https://tdmu.edu.vn/img/img-kham-pha-tdmu.jpg',
+      url: 'https://example.com/course/2',
+    },
+    {
+      id: '3',
+      title: 'Hướng dẫn vị trí trong trường TDMU',
+      icon: 'graduation-cap',
+      imageUri: 'https://kiemdinhvatuvanxaydung.tdmu.edu.vn/img/bt3/images/V%E1%BB%8A%20TR%C3%8D%20PTN1855%20T%E1%BA%A0I%20TDMU.jpg',
+      url: 'https://example.com/course/3',
+    },
+  ];
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 150 }}>
       <View style={styles.header}>
@@ -36,54 +60,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       </View>
 
       <View style={styles.sectionContainer}>
-        <Text style={styles.sectionTitle}>Link</Text>
-        <TouchableOpacity>
-          <Text style={styles.seeAll}>See all</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.subjectsContainer}>
-        {[
-          { name: "Đkmh", icon: "graduation-cap" },
-          { name: "Ctss", icon: "building" },
-          { name: "E", icon: "book" },
-          { name: "Qlkh", icon: "star" },
-        ].map((subject) => (
-          <View style={styles.subject} key={subject.name}>
-            <Icon name={subject.icon} size={30} color="#fff" />
-            <Text style={styles.subjectText}>{subject.name}</Text>
-          </View>
-        ))}
-      </View>
-
-      <View style={styles.sectionContainer}>
         <Text style={styles.sectionTitle}>Latest News</Text>
         <TouchableOpacity>
           <Text style={styles.seeAll}>See all</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.coursesContainer}>
-        {[
-          { 
-            title: "Thông báo điều chỉnh thời gian đào tạo của sinh viên các khóa 2022 trở về trước", 
-            icon: "book", 
-            imageUri: 'https://thanhnien.mediacdn.vn/Uploaded/linhnt-qc/2022_02_28/tn2-8506.jpg' 
-          },
-          { 
-            title: "Quyết định sửa đổi, bổ sung quyết định 1774/QĐ-ĐHTDM ngày 17/11/2021", 
-            icon: "laptop", 
-            imageUri: 'https://tdmu.edu.vn/img/img-kham-pha-tdmu.jpg' 
-          },
-          { 
-            title: "Hướng dẫn vị trí trong trường TDMU", 
-            icon: "graduation-cap", 
-            imageUri: 'https://kiemdinhvatuvanxaydung.tdmu.edu.vn/img/bt3/images/V%E1%BB%8A%20TR%C3%8D%20PTN1855%20T%E1%BA%A0I%20TDMU.jpg' 
-          },
-        ].map((course, index) => (
-          <View style={styles.courseCard} key={index}>
+        {courses.map((course) => (
+          <TouchableOpacity
+            key={course.id}
+            style={styles.courseCard}
+            onPress={() => navigation.navigate('CourseDetailScreen', { courseId: course.id, courseUrl: course.url })}
+          >
             <Image source={{ uri: course.imageUri }} style={styles.courseImage} />
             <Text style={styles.courseTitle}>{course.title}</Text>
-            
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
     </ScrollView>

@@ -7,7 +7,7 @@ export interface CalendarEvent {
     location?: string;
     description?: string;
     notification?: string;
-    type: 'event' | 'class' | 'reminder';
+    type: 'event' | 'class';
     color?: string;
     recurrence?: {
       frequency: 'daily' | 'weekly' | 'monthly';

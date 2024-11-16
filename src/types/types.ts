@@ -11,5 +11,5 @@ export type RootStackParamList = {
   AddNoteDrawer: { note?: { id: string; title: string; content: string } };
   AddCalendarDrawer: undefined;
   NotesListScreen: undefined;
-  NoteDetailScreen: { noteId: string };
-  };
+  NoteDetailScreen: { noteId: string }; 
+};

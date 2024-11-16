@@ -3,9 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import * as Font from 'expo-font';
 import AppNavigator from './src/navigation/AppNavigator';
+import { useNoteStore } from './src/store/noteStore';
+import * as Notifications from 'expo-notifications';
 
 export default function App() {
   const [fontLoaded, setFontLoaded] = useState(false);
+  const loadNotes = useNoteStore((state) => state.loadNotes);
 
   useEffect(() => {
     async function loadFont() {
@@ -15,6 +18,8 @@ export default function App() {
       setFontLoaded(true);
     }
     loadFont();
+    loadNotes();
+    Notifications.requestPermissionsAsync();
   }, []);
 
   if (!fontLoaded) {

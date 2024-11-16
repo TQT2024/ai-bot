@@ -13,6 +13,8 @@ import AddNoteDrawer from '../components/AddNoteDrawer';
 import AddCalendarDrawer from '../components/AddCalendarDrawer';
 import NotesListScreen from '../screens/NotesListScreen';
 import NoteDetailScreen from '../screens/NoteDetailScreen';
+import CalendarScreen from '../screens/CalendarScreen';
+import CourseDetailScreen from '../screens/CourseDetailScreen';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -20,7 +22,7 @@ const Stack = createStackNavigator();
 export type RootStackParamList = {
   HomeStack: {
     screen: 'Home' | 'Settings' | 'Add' | 'Notifications' | 'Profile' |
-     'AddNoteDrawer' | 'AddCalendarDrawer' | 'NotesListScreen';
+     'AddNoteDrawer' | 'AddCalendarDrawer' | 'NotesListScreen' | 'CourseDetailScreen';
   };
   NoteStack: {
     screen: 'NotesListScreen' | 'NoteDetailScreen';
@@ -34,6 +36,7 @@ export type RootStackParamList = {
   AddCalendarDrawer: undefined;
   NotesListScreen: undefined;
   NoteDetailScreen: { noteId: string };
+  CourseDetailScreen: { title: string; url: string };
 
 };
 
@@ -70,6 +73,14 @@ const HomeStack = () => (
         options={{
           title: 'Add Calendar',
           presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
+        name="CourseDetailScreen"
+        component={CourseDetailScreen}
+        options={{
+          title: 'News Detail',
+          headerShown: true,
         }}
       />
     </Stack.Navigator>
@@ -117,7 +128,9 @@ const AppNavigator = () => {
         options={{ 
           headerShown: false,
         }}
-      />
+        />
+        <Stack.Screen name="Calendar" component={CalendarScreen} options={{ headerShown: true }}/>
+        <Stack.Screen name="AddScreen" component={AddScreen} options={{ headerShown: true }}/>
       </Drawer.Navigator>
     </NavigationContainer>
   );

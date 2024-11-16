@@ -15,7 +15,7 @@ type NoteStore = {
   notes: Note[];
   addNote: (newNote: Note) => void;
   updateNote: (updatedNote: Note) => void;
-  loadNotes: () => void;
+  loadNotes: () => Promise<void>;
 };
 
 export const useNoteStore = create<NoteStore>((set) => ({
@@ -34,11 +34,15 @@ export const useNoteStore = create<NoteStore>((set) => ({
       AsyncStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(updatedNotes));
       return { notes: updatedNotes };
     }),
-  loadNotes: async () => {
-    const storedNotes = await AsyncStorage.getItem(NOTES_STORAGE_KEY);
-    if (storedNotes) {
-      set({ notes: JSON.parse(storedNotes) });
-    }
-  },
+    loadNotes: async () => {
+      try {
+        const storedNotes = await AsyncStorage.getItem(NOTES_STORAGE_KEY);
+        if (storedNotes) {
+          set({ notes: JSON.parse(storedNotes) });
+        }
+      } catch (error) {
+        console.error('Failed to load notes from storage:', error);
+      }
+    },
   
 }));

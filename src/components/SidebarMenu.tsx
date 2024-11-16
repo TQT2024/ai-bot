@@ -15,12 +15,9 @@ const SidebarMenu: React.FC<DrawerContentComponentProps> = (props) => {
         <Text style={styles.sidebarTitle}>Home</Text>
       </TouchableOpacity>
       {[
-        { title: "Quản lý ghi chú", icon: "pencil", screen: "NotesListScreen" },
-        { title: "Quản lý chi tiêu", icon: "dollar" },
-        { title: "Quản lý lịch trong ngày", icon: "calendar" },
-        { title: "Sự kiện quan trọng", icon: "calendar-check-o" },
-        { title: "Quản lý âm thanh", icon: "music" },
-        { title: "Cài đặt", icon: "cog" },
+        { title: "Note Management", icon: "pencil", screen: "NotesListScreen" },
+        { title: "Calendar Management", icon: "calendar", screen: "Calendar" },
+        { title: "Setting", icon: "cog" },
         { title: "Account", icon: "user" },
       ].map((menuItem, index) => (
         <TouchableOpacity

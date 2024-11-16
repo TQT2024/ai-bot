@@ -21,14 +21,15 @@ const NotesListScreen: React.FC = () => {
   useEffect(() => {
     loadNotes();
   }, [loadNotes]);
+  
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={styles.header} >
         <TouchableOpacity onPress={() => navigation.openDrawer()}>
-          <Icon name="bars" size={24} color="#3F51B5" />
+          <Icon name="bars" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Danh Sách Ghi Chú</Text>
+        <Text style={styles.headerTitle}>Notes</Text>
       </View>
       <FlatList
         data={notes}
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#3F51B5',
+    color: '#000',
     marginLeft: 10,
   },
   noteItem: {

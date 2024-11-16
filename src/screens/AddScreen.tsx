@@ -2,33 +2,64 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
+import { useLayoutEffect } from 'react';
 import { RootStackParamList } from '../types/types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNoteStore } from '../store/noteStore';
 import useCalendarStore from '../store/calendarStore';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
 
-type AddScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddScreen'>;
+type AddScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddScreen'> & 
+  DrawerNavigationProp<RootStackParamList>;
 
 const AddScreen = () => {
   const navigation = useNavigation<AddScreenNavigationProp>();
   const notes = useNoteStore((state) => state.notes);
   const events = useCalendarStore((state) => state.events);
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => navigation.openDrawer()}
+          style={styles.menuButton}
+        >
+          <Icon name="bars" size={24} color="#000" />
+        </TouchableOpacity>
+      ),
+      headerTitle: 'Add',
+      headerTitleAlign: 'center',
+    });
+  }, [navigation]);
+
   const combinedData = [
     ...notes.map((note) => ({ type: 'note', title: `Note added: ${note.title}`, id: note.id, createdTime: note.timestamp })),
     ...events.map((event) => ({ type: 'event', title: `Event added: ${event.title}`, id: event.id, createdTime: event.timestamp })),
   ]
-
-  // FILO
   .sort((a, b) => b.createdTime - a.createdTime)
   .slice(0, 10);
+
+  const createTimeAgo = (timestamp: number) => {
+    const now = Date.now();
+    const difference = now - timestamp;
+
+    const seconds = Math.floor(difference / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+    if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    return `${seconds} second${seconds > 1 ? 's' : ''} ago`;
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.topSection}>
         <TouchableOpacity
           style={[styles.card, { backgroundColor: '#0171C6' }]}
-          onPress={() => navigation.navigate({ name: 'AddNoteDrawer', params: { note: undefined } })}
+          onPress={() => navigation.navigate('AddNoteDrawer', { note: undefined })}
         >
           <Icon name="sticky-note" size={30} color="#fff" />
           <Text style={styles.cardText}>Add Note</Text>
@@ -36,7 +67,7 @@ const AddScreen = () => {
 
         <TouchableOpacity
           style={[styles.card, { backgroundColor: '#0171C6' }]}
-          onPress={() => navigation.navigate({ name: 'AddCalendarDrawer', params: undefined })}
+          onPress={() => navigation.navigate('AddCalendarDrawer')}
         >
           <Icon name="calendar" size={30} color="#fff" />
           <Text style={styles.cardText}>Add Calendar</Text>
@@ -50,7 +81,10 @@ const AddScreen = () => {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.noteItem}>
-              <Text style={styles.noteTitle}>{item.title}</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Text style={styles.noteTitle}>{item.title}</Text>
+                  <Text>{createTimeAgo(item.createdTime)}</Text>
+                </View>
             </View>
           )}
         />
@@ -106,6 +140,9 @@ const styles = StyleSheet.create({
   },
   noteTitle: {
     fontSize: 16,
+  },
+  menuButton: {
+    paddingLeft: 15,
   },
 });
 

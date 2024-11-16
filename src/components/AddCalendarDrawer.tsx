@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,32 @@ import {
   ScrollView,
   Switch,
   Alert,
+  Modal
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import useCalendarStore from '../store/calendarStore';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useNavigation } from '@react-navigation/native';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
+const REMINDER_INTERVALS = [
+  { label: '1 day before', minutes: 24 * 60 },
+  { label: '6 hours before', minutes: 6 * 60 },
+  { label: '1 hour before', minutes: 60 },
+  { label: '30 minutes before', minutes: 30 },
+  { label: '15 minutes before', minutes: 15 },
+  { label: '5 minutes before', minutes: 5 },
+];
+
 
 const AddCalendarDrawer: React.FC = () => {
   const addEvent = useCalendarStore((state) => state.addEvent);
@@ -25,15 +46,62 @@ const AddCalendarDrawer: React.FC = () => {
     isAllDay: false,
     location: '',
     description: '',
-    notification: '30 minutes before',
-    type: 'event' as 'event' | 'class' | 'reminder',
+    type: 'event' as 'event' | 'class',
     color: '#4285f4',
     timestamp: Date.now(),
+    reminders: [24 * 60, 60, 15, 5],
+    notificationIds: [] as string[],
   });
 
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
-  const [eventType, setEventType] = useState<'event' | 'class' | 'reminder'>('event');
+  const [eventType, setEventType] = useState<'event' | 'class'>('event');
+  const [showReminderModal, setShowReminderModal] = useState(false);
+
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
+
+  const registerForPushNotificationsAsync = async () => {
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      
+      if (finalStatus !== 'granted') {
+        Alert.alert('Error', 'Failed to get push token for push notification!');
+        return;
+      }
+    } 
+  };
+
+  const scheduleNotification = async (notificationTime: Date) => {
+    try {
+      const trigger = new Date(notificationTime);
+      trigger.setSeconds(0);
+      
+      const notificationId = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: eventData.title,
+          body: `${eventData.type} starting in ${trigger < new Date(eventData.startDate) ? 
+            `${Math.round((new Date(eventData.startDate).getTime() - trigger.getTime()) / (1000 * 60))} minutes` : 
+            'now'}`,
+          sound: true,
+          priority: Notifications.AndroidNotificationPriority.HIGH,
+          vibrate: [0, 250, 250, 250],
+        },
+        trigger,
+      });
+      return notificationId;
+    } catch (error) {
+      console.error('Error scheduling notification:', error);
+      return null;
+    }
+  };
 
   const handleSave = async () => {
     if (!eventData.title || !eventData.startDate) {
@@ -41,11 +109,40 @@ const AddCalendarDrawer: React.FC = () => {
       return;
     }
 
-    Alert.alert('Success', 'Event created successfully');
-    navigation.goBack();
-
     try {
-      await addEvent(eventData);
+      // Cancel any existing notifications for this event
+      if (eventData.notificationIds.length > 0) {
+        await Promise.all(
+          eventData.notificationIds.map(id => Notifications.cancelScheduledNotificationAsync(id))
+        );
+      }
+
+      // Schedule new notifications for each reminder interval
+      const notificationIds = [];
+      const startTime = new Date(eventData.startDate).getTime();
+
+      for (const minutes of eventData.reminders) {
+        const notificationTime = new Date(startTime - minutes * 60 * 1000);
+        const now = new Date();
+
+        // Only schedule if the notification time is in the future
+        if (notificationTime > now) {
+          const notificationId = await scheduleNotification(notificationTime);
+          if (notificationId) {
+            notificationIds.push(notificationId);
+          }
+        }
+      }
+
+      // Update event data with notification IDs
+      const updatedEventData = {
+        ...eventData,
+        notificationIds,
+      };
+
+      await addEvent(updatedEventData);
+      Alert.alert('Success', 'Event created successfully');
+      navigation.goBack();
     } catch (error) {
       console.error("Save error:", error);
       Alert.alert('Error', 'Failed to save event');
@@ -58,6 +155,48 @@ const AddCalendarDrawer: React.FC = () => {
       [`${type}Date`]: date.toISOString(),
     }));
   };
+
+  const toggleReminder = (minutes: number) => {
+    setEventData((prev) => ({
+      ...prev,
+      reminders: prev.reminders.includes(minutes)
+        ? prev.reminders.filter(r => r !== minutes)
+        : [...prev.reminders, minutes].sort((a, b) => b - a)
+    }));
+  };
+
+  const ReminderModal = () => (
+    <Modal
+      visible={showReminderModal}
+      transparent
+      animationType="slide"
+      onRequestClose={() => setShowReminderModal(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Set Reminders</Text>
+          {REMINDER_INTERVALS.map(({ label, minutes }) => (
+            <TouchableOpacity
+              key={minutes}
+              style={styles.reminderItem}
+              onPress={() => toggleReminder(minutes)}
+            >
+              <Text style={styles.reminderLabel}>{label}</Text>
+              {eventData.reminders.includes(minutes) && (
+                <MaterialIcons name="check" size={24} color="#4285f4" />
+              )}
+            </TouchableOpacity>
+          ))}
+          <TouchableOpacity
+            style={styles.modalCloseButton}
+            onPress={() => setShowReminderModal(false)}
+          >
+            <Text style={styles.modalCloseButtonText}>Done</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
 
   return (
     <View style={styles.container}>
@@ -72,7 +211,7 @@ const AddCalendarDrawer: React.FC = () => {
       </View>
 
       <View style={styles.typeSelector}>
-        {(['event', 'class', 'reminder'] as const).map((type) => (
+        {(['event', 'class'] as const).map((type) => (
           <TouchableOpacity
             key={type}
             style={[
@@ -94,6 +233,18 @@ const AddCalendarDrawer: React.FC = () => {
             </Text>
           </TouchableOpacity>
         ))}
+
+        {/* <TouchableOpacity
+          style={[styles.bellButton, eventData.reminders.length > 0 && styles.bellButtonActive]}
+          onPress={() => setShowReminderModal(true)}
+        >
+          <MaterialIcons
+            name={eventData.reminders.length > 0 ? "notifications-active" : "notifications-none"}
+            size={24}
+            color={eventData.reminders.length > 0 ? "#4285f4" : "#5f6368"}
+          />
+        </TouchableOpacity>
+        <ReminderModal /> */}
       </View>
 
       <ScrollView style={styles.formContainer}>
@@ -287,6 +438,57 @@ const styles = StyleSheet.create({
   selectedTypeButtonText: {
     color: '#fff',
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: '80%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  reminderItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  reminderLabel: {
+    fontSize: 16,
+    color: '#333',
+  },
+  modalCloseButton: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#4285f4',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalCloseButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  bellButton: {
+    padding: 10,
+    borderRadius: 20,
+    marginLeft: 10,
+  },
+  bellButtonActive: {
+    backgroundColor: '#e8f0fe',
+  },
+  
 });
 
 export default AddCalendarDrawer;
