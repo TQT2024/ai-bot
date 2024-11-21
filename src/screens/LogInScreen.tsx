@@ -53,7 +53,7 @@ const DangNhap = () => {
 
     <TouchableOpacity style={styles.googleButton} >
       <Icon name="google" size={18} color="#CC0000" />
-      <Text style={styles.buttonText2}> Đăng nhập bằng Google/  </Text>
+      <Text style={styles.buttonText2}> Đăng nhập bằng Google/ </Text>
       <Icon name="facebook" size={18} color="#4267B2" />
       <Text style={styles.buttonText3}> Đăng nhập bằng Facebook</Text>
     </TouchableOpacity>

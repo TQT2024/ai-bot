@@ -30,7 +30,7 @@ const AddScreen = () => {
     // Xóa nội dung ô nhập tin nhắn
     setMessage('');
 
-    // Bot phản hồi tự động
+    // Chat Bot phản hồi tự động
     setTimeout(() => {
       const botMessage = {
         id: Date.now().toString(),

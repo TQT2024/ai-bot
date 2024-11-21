@@ -46,7 +46,7 @@ const SettingsScreen: React.FC = () => {
 
       {/* Chia sẻ */}
       <TouchableOpacity style={styles.settingItem}>
-        <Text style={styles.settingText}>Chia sẻ ứng dụng</Text>
+        <Text style={styles.settingText}>Chia sẻ</Text>
       </TouchableOpacity>
     </View>
   );

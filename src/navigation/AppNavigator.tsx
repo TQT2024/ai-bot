@@ -108,8 +108,15 @@ const HomeStack = () => (
 
 const AuthStack = () => (
   <Stack.Navigator >
-    <Stack.Screen name="DangNhap" component={DangNhap} options={{ headerShown: false }} />
-    <Stack.Screen name="DangKy" component={DangKy} options={{ headerShown: false }} />
+    <Stack.Screen 
+      name="DangNhap" 
+      component={DangNhap} 
+      options={{ headerShown: false }} 
+    />
+    <Stack.Screen 
+      name="DangKy" 
+      component={DangKy} 
+      options={{ headerShown: false }} />
   </Stack.Navigator>
 );
 
