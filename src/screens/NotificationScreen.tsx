@@ -1,20 +1,41 @@
-// screens/Home.tsx
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { RootStackParamList } from '../types/types';
+import { RootStackParamList } from '../navigation/AppNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
 
-type NotificationsScreenProps = StackScreenProps<RootStackParamList, 'NotificationsScreen'>;
+type ChatScreenProps = StackScreenProps<RootStackParamList, 'ChatScreen'>;
 
-const NotificationScreen: React.FC = () => {
+const ChatScreen = ({ navigation }: ChatScreenProps) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.username}>Trường đại học Thủ Dầu Một</Text>
       </View>
       
-      
+      <View style={styles.cardContainer}>
+        <TouchableOpacity 
+          style={[styles.card, { backgroundColor: '#FFB74D' }]}
+          onPress={() => navigation.navigate('ChatScreen')}
+        >
+          <Icon name="plane" size={30} color="#fff" />
+          <Text style={styles.cardText}>Tìm chuyến bay</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.promotionContainer}>
+        <Text style={styles.promotionTitle}>Ưu đãi hiện hành</Text>
+        <TouchableOpacity style={styles.promotionCard}>
+          <Text style={styles.promotionText}>Xem tất cả khuyến mãi</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.footer}>
+        <Text style={styles.footerTitle}>Ưu đãi về máy</Text>
+        <TouchableOpacity style={styles.footerCard}>
+          <Text style={styles.footerText}>Sản phẩm, vé, thuê xe</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };
@@ -110,4 +131,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NotificationScreen;
+export default ChatScreen;
