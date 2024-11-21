@@ -110,14 +110,12 @@ const AddCalendarDrawer: React.FC = () => {
     }
 
     try {
-      // Cancel any existing notifications for this event
       if (eventData.notificationIds.length > 0) {
         await Promise.all(
           eventData.notificationIds.map(id => Notifications.cancelScheduledNotificationAsync(id))
         );
       }
 
-      // Schedule new notifications for each reminder interval
       const notificationIds = [];
       const startTime = new Date(eventData.startDate).getTime();
 
@@ -125,7 +123,6 @@ const AddCalendarDrawer: React.FC = () => {
         const notificationTime = new Date(startTime - minutes * 60 * 1000);
         const now = new Date();
 
-        // Only schedule if the notification time is in the future
         if (notificationTime > now) {
           const notificationId = await scheduleNotification(notificationTime);
           if (notificationId) {
@@ -134,7 +131,6 @@ const AddCalendarDrawer: React.FC = () => {
         }
       }
 
-      // Update event data with notification IDs
       const updatedEventData = {
         ...eventData,
         notificationIds,
@@ -234,17 +230,6 @@ const AddCalendarDrawer: React.FC = () => {
           </TouchableOpacity>
         ))}
 
-        {/* <TouchableOpacity
-          style={[styles.bellButton, eventData.reminders.length > 0 && styles.bellButtonActive]}
-          onPress={() => setShowReminderModal(true)}
-        >
-          <MaterialIcons
-            name={eventData.reminders.length > 0 ? "notifications-active" : "notifications-none"}
-            size={24}
-            color={eventData.reminders.length > 0 ? "#4285f4" : "#5f6368"}
-          />
-        </TouchableOpacity>
-        <ReminderModal /> */}
       </View>
 
       <ScrollView style={styles.formContainer}>

@@ -1,110 +1,102 @@
-// screens/Home.tsx
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Switch, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { RootStackParamList } from '../types/types';
-import { StackScreenProps } from '@react-navigation/stack';
-
-type SettingsScreenProps = StackScreenProps<RootStackParamList, 'SettingsScreen'>;
+import { useNavigation } from '@react-navigation/native';
 
 const SettingsScreen: React.FC = () => {
+  const navigation = useNavigation();
+
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Icon name="arrow-left" size={25} color="#000" />
+        <Text style={styles.backText}>Quay lại</Text>
+      </TouchableOpacity>
+
       <View style={styles.header}>
-        <Text style={styles.username}>Trường đại học Thủ Dầu Một</Text>
+        <Text style={styles.title}>Cài đặt</Text>
       </View>
-    </ScrollView>
+
+      {/* Hiển thị thông báo */}
+      <View style={styles.settingItem}>
+        <Text style={styles.settingText}>Cho phép hiển thị thông báo</Text>
+        <Switch />
+      </View>
+
+      {/* Thay đổi màu nền */}
+      <View style={styles.settingItem}>
+        <Text style={styles.settingText}>Thay đổi màu nền</Text>
+        <View style={styles.colorOptions}>
+          <View style={[styles.colorBox, { backgroundColor: '#f8f9fa' }]} />
+          <View style={[styles.colorBox, { backgroundColor: '#d1c4e9' }]} />
+          <View style={[styles.colorBox, { backgroundColor: '#b3e5fc' }]} />
+          <View style={[styles.colorBox, { backgroundColor: '#ffe0b2' }]} />
+        </View>
+      </View>
+
+      {/* Tài khoản */}
+      <TouchableOpacity style={styles.settingItem}>
+        <Text style={styles.settingText}>Tài khoản</Text>
+      </TouchableOpacity>
+
+      {/* Liên hệ */}
+      <TouchableOpacity style={styles.settingItem}>
+        <Text style={styles.settingText}>Liên hệ</Text>
+      </TouchableOpacity>
+
+      {/* Chia sẻ */}
+      <TouchableOpacity style={styles.settingItem}>
+        <Text style={styles.settingText}>Chia sẻ</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f2f2f2',
+    padding: 20,
+    backgroundColor: '#ffffff',
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    marginTop:25,
+  },
+  backText: {
+    marginLeft: 10,
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   header: {
-    padding: 20,
-    backgroundColor: '#3F51B5',
+    marginBottom: 20,
     alignItems: 'center',
   },
-  username: {
-    color: '#fff',
-    fontSize: 20,
+  title: {
+    fontSize: 24,
     fontWeight: 'bold',
   },
-  cardContainer: {
+  settingItem: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    padding: 10,
-  },
-  card: {
-    width: '48%',
-    padding: 20,
-    borderRadius: 10,
-    marginVertical: 5,
     alignItems: 'center',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
-  cardText: {
-    color: '#fff',
-    marginTop: 10,
-    fontWeight: 'bold',
-  },
-  promotionContainer: {
-    padding: 20,
-  },
-  promotionTitle: {
+  settingText: {
     fontSize: 18,
-    fontWeight: 'bold',
   },
-  promotionCard: {
-    backgroundColor: '#FFB74D',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
+  colorOptions: {
+    flexDirection: 'row',
     marginTop: 10,
   },
-  promotionText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  footer: {
-    padding: 20,
-  },
-  footerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  footerCard: {
-    backgroundColor: '#3F51B5',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  footerText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  customButtonContainer: {
-    top: -30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  customButton: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#FF6347',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  shadow: {
-    shadowColor: '#7F5DF0',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.5,
-    elevation: 5,
+  colorBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
   },
 });
 

@@ -53,7 +53,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
       <View style={styles.bannerContainer}>
         <View style={styles.banner}>
-          <Text style={styles.discountText}>Chat AI</Text>
+          <TouchableOpacity style={styles.discountText} onPress={() => navigation.navigate('HomeStack', { screen: 'ChatScreen'} )}>
+            <Text style={styles.discountText} >Chat AI</Text>
+          </TouchableOpacity>
           <Text style={styles.bannerTitle}>WELCOME!</Text>
           <Text style={styles.bannerSubtitle}>Giải đáp những câu hỏi về trường TDMU</Text>
         </View>

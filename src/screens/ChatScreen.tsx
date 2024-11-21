@@ -1,134 +1,181 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { RootStackParamList } from '../types/types';
-import { StackScreenProps } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
 
-type ChatScreenProps = StackScreenProps<RootStackParamList, 'ChatScreen'>;
+const AddScreen = () => {
+  const navigation = useNavigation();
+  const [messages, setMessages] = useState([
+    { id: '1', text: 'Welcome! How can I help you?', sender: 'bot' },
+  ]);
+  const [message, setMessage] = useState('');
 
-const ChatScreen = ({ navigation }: ChatScreenProps) => {
+  // Hàm gửi tin nhắn
+  const sendMessage = () => {
+    if (message.trim() === '') return;
+
+    // Thêm tin nhắn của người dùng vào danh sách
+    const userMessage = { id: Date.now().toString(), text: message, sender: 'user' };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+
+    // Xóa nội dung ô nhập tin nhắn
+    setMessage('');
+
+    // Chat Bot phản hồi tự động
+    setTimeout(() => {
+      const botMessage = {
+        id: Date.now().toString(),
+        text: 'This is a bot reply!',
+        sender: 'bot',
+      };
+      setMessages((prevMessages) => [...prevMessages, botMessage]);
+    }, 1000);
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.username}>Trường đại học Thủ Dầu Một</Text>
-      </View>
-      
-      <View style={styles.cardContainer}>
-        <TouchableOpacity 
-          style={[styles.card, { backgroundColor: '#FFB74D' }]}
-          onPress={() => navigation.navigate('ChatScreen')}
-        >
-          <Icon name="plane" size={30} color="#fff" />
-          <Text style={styles.cardText}>Tìm chuyến bay</Text>
-        </TouchableOpacity>
+    <View style={styles.container}>
+      {/* Nút quay lại */}
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Icon name="arrow-left" size={20} color="#000" />
+        <Text style={styles.backText}>Quay lại</Text>
+      </TouchableOpacity>
+
+      {/* Khung trò chuyện */}
+      <View style={styles.chatContainer}>
+        <FlatList
+          data={messages}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View
+              style={[
+                styles.message,
+                item.sender === 'user' ? styles.userMessage : styles.botMessage,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.messageText,
+                  item.sender === 'user' ? styles.userText : styles.botText,
+                ]}
+              >
+                {item.text}
+              </Text>
+            </View>
+          )}
+          contentContainerStyle={styles.chatContent}
+        />
       </View>
 
-      <View style={styles.promotionContainer}>
-        <Text style={styles.promotionTitle}>Ưu đãi hiện hành</Text>
-        <TouchableOpacity style={styles.promotionCard}>
-          <Text style={styles.promotionText}>Xem tất cả khuyến mãi</Text>
+      {/* Khung nhập tin nhắn */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.inputContainer}
+      >
+        <TextInput
+          style={styles.input}
+          placeholder="Type a message..."
+          placeholderTextColor="#aaa"
+          value={message}
+          onChangeText={setMessage}
+        />
+        <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+          <Icon name="send" size={20} color="#fff" />
         </TouchableOpacity>
-      </View>
-
-      <View style={styles.footer}>
-        <Text style={styles.footerTitle}>Ưu đãi về máy</Text>
-        <TouchableOpacity style={styles.footerCard}>
-          <Text style={styles.footerText}>Sản phẩm, vé, thuê xe</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#E9EEF3',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 50,
+    elevation: 5,
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+  },
+  backText: {
+    marginLeft: 10,
+    color: '#000',
+    fontSize: 16,
+  },
+  chatContainer: {
+    flex: 1,
+    paddingBottom: 80,
+    paddingHorizontal: 10,
+    marginTop: 70,
+  },
+  chatContent: {
+    flexGrow: 1,
+    justifyContent: 'flex-end',
+  },
+  message: {
+    padding: 10,
+    borderRadius: 15,
+    marginBottom: 10,
+    maxWidth: '75%',
+  },
+  userMessage: {
+    backgroundColor: '#3F51B5',
+    alignSelf: 'flex-end',
+  },
+  botMessage: {
+    backgroundColor: '#fff',
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  messageText: {
+    fontSize: 16,
+  },
+  userText: {
+    color: '#fff',
+  },
+  botText: {
+    color: '#333',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+    marginBottom: 120,
+  },
+  input: {
+    flex: 1,
+    padding: 10,
+    fontSize: 16,
+    borderRadius: 20,
     backgroundColor: '#f2f2f2',
   },
-  header: {
-    padding: 20,
-    backgroundColor: '#3F51B5',
-    alignItems: 'center',
-  },
-  username: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  cardContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+  sendButton: {
+    marginLeft: 10,
+    backgroundColor: '#000066',
     padding: 10,
-  },
-  card: {
-    width: '48%',
-    padding: 20,
-    borderRadius: 10,
-    marginVertical: 5,
-    alignItems: 'center',
-  },
-  cardText: {
-    color: '#fff',
-    marginTop: 10,
-    fontWeight: 'bold',
-  },
-  promotionContainer: {
-    padding: 20,
-  },
-  promotionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  promotionCard: {
-    backgroundColor: '#FFB74D',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  promotionText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  footer: {
-    padding: 20,
-  },
-  footerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  footerCard: {
-    backgroundColor: '#3F51B5',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  footerText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  customButtonContainer: {
-    top: -30,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  customButton: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#FF6347',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  shadow: {
-    shadowColor: '#7F5DF0',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.5,
-    elevation: 5,
   },
 });
 
-export default ChatScreen;
+export default AddScreen;
