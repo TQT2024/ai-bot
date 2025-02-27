@@ -19,6 +19,10 @@ import CalendarScreen from '../screens/CalendarScreen';
 import CourseDetailScreen from '../screens/CourseDetailScreen';
 import DangKy from '../screens/SignUpScreen';
 import DangNhap from '../screens/LogInScreen';
+import AdminScreen from '../screens/AdminScreen';
+import ManageUsers from '../screens/ManageUser';
+import ManagePost from '../screens/ManagePost';
+import PostDetailScreen from '../screens/PostDetailScreen';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -32,7 +36,10 @@ export type RootStackParamList = {
     screen: 'NotesListScreen' | 'NoteDetailScreen';
   };
   AuthStack: {
-    screen: 'DangNhap' | 'DangKy';
+    screen: 'DangNhap' | 'DangKy' | 'AdminScreen';
+  }
+  AdminStack: {
+    screen: 'AdminScreen' | 'ManageUsers' | 'ManagePost' | 'PostDetailScreen';
   }
 
   Home: undefined;
@@ -48,6 +55,10 @@ export type RootStackParamList = {
   CourseDetailScreen: { title: string; url: string };
   DangNhap: undefined;
   DangKy: undefined;
+  AdminScreen: undefined;
+  ManageUsers: undefined;
+  ManagePost: undefined;
+  PostDetailScreen: { postId: string };
 };
 
 const HomeStack = () => (
@@ -117,6 +128,11 @@ const AuthStack = () => (
       name="DangKy" 
       component={DangKy} 
       options={{ headerShown: false }} />
+    <Stack.Screen
+      name="AdminScreen"
+      component={AdminScreen}
+      options={{ headerShown: false, title: 'Admin' }}
+    />
   </Stack.Navigator>
 );
 
@@ -140,23 +156,69 @@ const NotesStack = () => (
   </Stack.Navigator>
 );
 
+const AdminStack = () => (
+  <Stack.Navigator
+    screenOptions={{
+      headerTitleAlign: 'center',
+    }}
+    initialRouteName="AdminScreen"
+  >
+    <Stack.Screen
+      name="AdminScreen"
+      component={AdminScreen}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="ManageUser"
+      component={ManageUsers}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="ManagePost"
+      component={ManagePost}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="PostDetailScreen"
+      component={PostDetailScreen}
+      options={{ headerShown: false }}
+    />
+  </Stack.Navigator>
+);
+
 const AppNavigator = () => {
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const { isLoggedIn, role } = useAuthStore();
 
   return (
     <NavigationContainer>
       {isLoggedIn ? (
-      <Drawer.Navigator
-        drawerContent={(props) => <SidebarMenu {...props} />}
-        screenOptions={{
-          headerShown: false,
-          drawerType: 'slide',
-          overlayColor: 'rgba(0, 0, 0, 0.5)',
-        }}
-      >
-        <Drawer.Screen name="HomeStack" component={HomeStack} />
-        <Drawer.Screen name="NoteStack" component={NotesStack} />
-        <Drawer.Screen name="AuthStack" component={AuthStack} />
+        role === 'admin' ? (
+          <Drawer.Navigator
+            drawerContent={(props) => <SidebarMenu {...props} />}
+            screenOptions={{
+              headerShown: false,
+              drawerType: 'slide',
+              overlayColor: 'rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            <Drawer.Screen name="AdminScreen" component={AdminScreen} />
+            <Drawer.Screen name="ManageUsers" component={ManageUsers} />
+            <Drawer.Screen name="ManagePost" component={ManagePost} />
+            <Drawer.Screen name="PostDetailScreen" component={PostDetailScreen} />
+          </Drawer.Navigator>
+        ) : (
+          <Drawer.Navigator
+            drawerContent={(props) => <SidebarMenu {...props} />}
+            screenOptions={{
+              headerShown: false,
+              drawerType: 'slide',
+              overlayColor: 'rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            <Drawer.Screen name="HomeStack" component={HomeStack} />
+            <Drawer.Screen name="NoteStack" component={NotesStack} />
+            <Drawer.Screen name="AuthStack" component={AuthStack} />
+            <Drawer.Screen name="AdminStack" component={AdminStack} />
         <Stack.Screen name="NotesListScreen" component={NotesListScreen} options={{ headerShown: false }} />
         <Stack.Screen
         name="NoteDetailScreen"
@@ -168,6 +230,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Calendar" component={CalendarScreen} options={{ headerShown: true }}/>
         <Stack.Screen name="AddScreen" component={AddScreen} options={{ headerShown: true }}/>
       </Drawer.Navigator>
+        )
       ) : (
         <AuthStack />
       )}
