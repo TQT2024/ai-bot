@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "ai-bot",
     "name": "ai-bot",
     "slug": "ai-bot",
     "version": "1.0.0",
@@ -18,7 +19,15 @@
         {
           "icon": "assets/icon.png",
           "color": "#ffffff",
-          "sounds": ["assets/mixkit-long-pop-2358.wav"]
+          "sounds": [
+            "assets/mixkit-long-pop-2358.wav"
+          ]
+        }
+      ],
+      [
+        "expo-google-sign-in",
+        {
+          "clientId": "759317752188-q3mlq3uis4m6iu7bk8553pvv2bj45irn.apps.googleusercontent.com"
         }
       ]
     ],
@@ -26,8 +35,11 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.anhtuatus.aibot",
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"]
-      }
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
+      },
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -35,10 +47,16 @@
         "backgroundColor": "#ffffff"
       },
       "useNextNotificationsApi": true,
-      "package": "com.anhtuatus.aibot"
+      "package": "com.anhtuatus.aibot",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "dc47898a-3ccb-4a7c-ba9b-01a762020ee4"
+      }
     }
   }
 }

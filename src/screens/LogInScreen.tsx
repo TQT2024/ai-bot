@@ -6,6 +6,7 @@ import { useUserStore } from '../store/storeUser';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
+import LogInGoogle from './logingoogle';
 
 type AuthStackNavigationProp = DrawerNavigationProp<RootStackParamList, 'AuthStack'>;
 
@@ -62,13 +63,11 @@ const DangNhap = () => {
         <Text style={styles.buttonText}>Đăng nhập</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.googleButton}>
+      {/* <TouchableOpacity style={styles.googleButton} onPress={signInWithGoogle}>
         <Icon name="google" size={18} color="#CC0000" />
-        <Text style={styles.buttonText2}> Đăng nhập bằng Google/ </Text>
-        <Icon name="facebook" size={18} color="#4267B2" />
-        <Text style={styles.buttonText3}> Đăng nhập bằng Facebook</Text>
-      </TouchableOpacity>
-
+        <Text style={styles.buttonText3}>Đăng nhập bằng Google</Text>
+      </TouchableOpacity> */}
+    <LogInGoogle />
       <View style={styles.linkContainer}>
         <TouchableOpacity onPress={handleNavigateToRegister}>
           <Text style={styles.linkText}>Đăng ký tài khoản</Text>

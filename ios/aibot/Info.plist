@@ -27,6 +27,7 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
+          <string>com.googleusercontent.apps.759317752188-ebsklhgqj6gvnnp4h6p4oigodle2v78c</string>
           <string>com.anhtuatus.aibot</string>
         </array>
       </dict>
