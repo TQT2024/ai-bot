@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
@@ -8,6 +8,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useNoteStore } from '../store/noteStore';
 import useCalendarStore from '../store/calendarStore';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { auth } from '../../firebaseconfig';
 
 type AddScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddScreen'> & 
   DrawerNavigationProp<RootStackParamList>;
@@ -16,7 +17,8 @@ const AddScreen = () => {
   const navigation = useNavigation<AddScreenNavigationProp>();
   const notes = useNoteStore((state) => state.notes);
   const events = useCalendarStore((state) => state.events);
-
+  const clearNotes = useNoteStore((state) => state.clearNotes);
+  const clearEvents = useCalendarStore((state) => state.clearEvents);
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
@@ -31,6 +33,11 @@ const AddScreen = () => {
       headerTitleAlign: 'center',
     });
   }, [navigation]);
+
+  useEffect(() => {
+    clearNotes();
+    clearEvents();
+  }, []);
 
   const combinedData = [
     ...notes.map((note) => ({ type: 'note', title: `Note added: ${note.title}`, id: note.id, createdTime: note.timestamp })),

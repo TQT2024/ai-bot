@@ -19,15 +19,20 @@
         {
           "icon": "assets/icon.png",
           "color": "#ffffff",
-          "sounds": [
-            "assets/mixkit-long-pop-2358.wav"
-          ]
+          "sounds": ["assets/mixkit-long-pop-2358.wav"]
         }
       ],
+
+      "@react-native-google-signin/google-signin",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-firebase/crashlytics",
       [
-        "expo-google-sign-in",
+        "expo-build-properties",
         {
-          "clientId": "759317752188-q3mlq3uis4m6iu7bk8553pvv2bj45irn.apps.googleusercontent.com"
+          "ios": {
+            "useFrameworks": "static"
+          }
         }
       ]
     ],
@@ -35,9 +40,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.anhtuatus.aibot",
       "infoPlist": {
-        "UIBackgroundModes": [
-          "remote-notification"
-        ]
+        "UIBackgroundModes": ["remote-notification"]
       },
       "googleServicesFile": "./GoogleService-Info.plist"
     },
@@ -58,5 +61,8 @@
         "projectId": "dc47898a-3ccb-4a7c-ba9b-01a762020ee4"
       }
     }
+  },
+  "devDependencies": {
+    "@react-native-community/cli": "latest"
   }
 }

@@ -28,6 +28,7 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
+        <data android:scheme="ai-bot"/>
         <data android:scheme="com.anhtuatus.aibot"/>
         <data android:scheme="exp+ai-bot"/>
       </intent-filter>

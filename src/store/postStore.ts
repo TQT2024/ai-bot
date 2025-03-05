@@ -1,6 +1,16 @@
+
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  orderBy,
+} from 'firebase/firestore';
+import { auth, db } from '../../firebaseconfig';
 
 export type Post = {
   id: string;
@@ -8,65 +18,84 @@ export type Post = {
   url: string;
   imageUri: string;
   icon: string;
+  userId: string; // Người tạo bài post
+  timestamp?: number; // Có thể thêm trường timestamp để sắp xếp theo thời gian
 };
 
 type PostState = {
   posts: Post[];
-  addPost: (post: Omit<Post, 'id'>) => void;
-  updatePost: (id: string, post: Partial<Omit<Post, 'id'>>) => void;
-  deletePost: (id: string) => void;
+  loadPosts: () => Promise<void>;
+  addPost: (post: Omit<Post, 'id' | 'userId' | 'timestamp'>) => Promise<void>;
+  updatePost: (id: string, post: Partial<Omit<Post, 'id'>>) => Promise<void>;
+  deletePost: (id: string) => Promise<void>;
 };
 
-export const usePostStore = create<PostState, [['zustand/persist', PostState]]>(
-  persist(
-    (set) => ({
-      // data for testing
-      posts: [
-        {
-          id: '1',
-          title: 'Thông báo điều chỉnh thời gian đào tạo của sinh viên các khóa 2022 trở về trước',
-          icon: 'book',
-          imageUri: 'https://thanhnien.mediacdn.vn/Uploaded/linhnt-qc/2022_02_28/tn2-8506.jpg',
-          url: 'https://tdmu.edu.vn/tin-tuc/thong-tin-nghien-cuu/khai-mac-chuoi-su-kien-khoa-hoc-cong-nghe-va-doi-moi-sang-tao-tdmu-nam-2024',
-        },
-        {
-          id: '2',
-          title: 'Quyết định sửa đổi, bổ sung quyết định 1774/QĐ-ĐHTDM ngày 17/11/2021',
-          icon: 'laptop',
-          imageUri: 'https://tdmu.edu.vn/img/img-kham-pha-tdmu.jpg',
-          url: 'https://example.com/post/2',
-        },
-        {
-          id: '3',
-          title: 'Hướng dẫn vị trí trong trường TDMU',
-          icon: 'graduation-cap',
-          imageUri: 'https://kiemdinhvatuvanxaydung.tdmu.edu.vn/img/bt3/images/V%E1%BB%8A%20TR%C3%8D%20PTN1855%20T%E1%BA%A0I%20TDMU.jpg',
-          url: 'https://example.com/post/3',
-        },
-      ],
-      addPost: (post) => {
-        const newPost: Post = {
-          id: Date.now().toString(),
-          ...post,
-        };
-        set((state) => ({ posts: [...state.posts, newPost] }));
-      },
-      updatePost: (id, post) => {
-        set((state) => ({
-          posts: state.posts.map((c) =>
-            c.id === id ? { ...c, ...post } : c
-          ),
-        }));
-      },
-      deletePost: (id) => {
-        set((state) => ({
-          posts: state.posts.filter((c) => c.id !== id),
-        }));
-      },
-    }),
-    {
-      name: 'post-storage',
-      storage: createJSONStorage(() => AsyncStorage),
+const POSTS_COLLECTION = 'posts';
+
+export const usePostStore = create<PostState>((set, get) => ({
+  posts: [],
+  loadPosts: async () => {
+    try {
+      // Truy vấn tất cả các bài post, có thể sắp xếp theo timestamp nếu có
+      const postsRef = collection(db, POSTS_COLLECTION);
+      const q = query(postsRef, orderBy('timestamp', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const posts: Post[] = querySnapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      })) as Post[];
+      set({ posts });
+    } catch (error) {
+      console.error('Error loading posts:', error);
     }
-  )
-);
+  },
+  addPost: async (postData) => {
+    // Lấy userId của người dùng hiện tại; nếu không có thì sử dụng 'anonymous'
+    const userId = auth.currentUser?.uid || 'anonymous';
+    try {
+      const newPost: Post = {
+        ...postData,
+        userId,
+        timestamp: Date.now(),
+        id: '', // Sẽ cập nhật sau khi thêm vào Firestore
+      };
+      const docRef = await addDoc(collection(db, POSTS_COLLECTION), newPost);
+      // Cập nhật state với bài post mới, gán id từ Firestore
+      set((state) => ({
+        posts: [...state.posts, { ...newPost, id: docRef.id }],
+      }));
+    } catch (error) {
+      console.error('Error adding post:', error);
+    }
+  },
+  updatePost: async (id, postData) => {
+    try {
+      await updateDoc(doc(db, POSTS_COLLECTION, id), postData);
+      set((state) => ({
+        posts: state.posts.map((p) => (p.id === id ? { ...p, ...postData } : p)),
+      }));
+    } catch (error) {
+      console.error('Error updating post:', error);
+    }
+  },
+  deletePost: async (id) => {
+    if (!id) {
+      console.error('Invalid id for deletion:', id);
+      return;
+    }
+    try {
+      await deleteDoc(doc(db, POSTS_COLLECTION, id));
+      set((state) => ({
+        posts: state.posts.filter((p) => p.id !== id),
+      }));
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  },
+  
+}));
+
+
+
+
+

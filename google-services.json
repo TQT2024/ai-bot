@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "759317752188-31pqa1loaqsqviafreu948apcm8haanq.apps.googleusercontent.com",
+          "client_id": "759317752188-ib537lub9cfba21h1k4riba35l49cdp7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.anhtuatus.aibot",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+            "certificate_hash": "7b0f9fb0a07bc9e44b3bf51e52aeb75895f5b803"
           }
         },
         {
@@ -35,7 +35,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "759317752188-q3mlq3uis4m6iu7bk8553pvv2bj45irn.apps.googleusercontent.com",
+              "client_id": "759317752188-ltlbvnh4m5mc6124antac90ei46hgf9i.apps.googleusercontent.com",
               "client_type": 3
             },
             {

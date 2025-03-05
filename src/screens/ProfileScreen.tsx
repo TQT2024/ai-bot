@@ -1,20 +1,62 @@
-// screens/Home.tsx
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { RootStackParamList } from '../types/types';
+// screens/ProfileScreen.tsx
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Image } from 'react-native';
+import { auth } from '../../firebaseconfig';
 import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../types/types';
+import { useAuthStore } from '../store/authStore';
 
 type ProfileScreenProps = StackScreenProps<RootStackParamList, 'ProfileScreen'>;
 
-const ProfileScreen: React.FC = () => {
+const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
+  const [currentUser, setCurrentUser] = useState(auth.currentUser);
+  const {logout }= useAuthStore();
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      setCurrentUser(user);
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      logout();
+    } catch (error) {
+      Alert.alert('Lỗi', 'Đã xảy ra lỗi khi đăng xuất');
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.username}>Trường đại học Thủ Dầu Một</Text>
+        <Text style={styles.headerTitle}>Thông tin cá nhân</Text>
+        {currentUser ? (
+          <View style={styles.profileInfo}>
+            {/* Hiển thị ảnh đại diện nếu có, ngược lại hiển thị placeholder */}
+            {currentUser.photoURL ? (
+              <Image source={{ uri: currentUser.photoURL }} style={styles.avatar} />
+            ) : (
+              <View style={[styles.avatar, styles.placeholderAvatar]}>
+                <Text style={styles.avatarText}>{currentUser.email?.[0].toUpperCase()}</Text>
+              </View>
+            )}
+            <Text style={styles.infoText}>Email: {currentUser.email}</Text>
+            <Text style={styles.infoText}>
+              Tên: {currentUser.displayName ? currentUser.displayName : 'Chưa cập nhật'}
+            </Text>
+            <Text style={styles.infoText}>
+              Số điện thoại: {currentUser.phoneNumber ? currentUser.phoneNumber : 'Chưa cập nhật'}
+            </Text>
+          </View>
+        ) : (
+          <Text style={styles.infoText}>Người dùng chưa đăng nhập</Text>
+        )}
       </View>
-      
-      
+
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutText}>Đăng xuất</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -29,84 +71,47 @@ const styles = StyleSheet.create({
     backgroundColor: '#3F51B5',
     alignItems: 'center',
   },
-  username: {
+  headerTitle: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
   },
-  cardContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    padding: 10,
-  },
-  card: {
-    width: '48%',
-    padding: 20,
-    borderRadius: 10,
-    marginVertical: 5,
+  profileInfo: {
+    marginTop: 20,
     alignItems: 'center',
   },
-  cardText: {
+  infoText: {
     color: '#fff',
-    marginTop: 10,
-    fontWeight: 'bold',
+    fontSize: 16,
+    marginVertical: 4,
   },
-  promotionContainer: {
-    padding: 20,
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 10,
   },
-  promotionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  promotionCard: {
-    backgroundColor: '#FFB74D',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  promotionText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  footer: {
-    padding: 20,
-  },
-  footerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  footerCard: {
-    backgroundColor: '#3F51B5',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  footerText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  customButtonContainer: {
-    top: -30,
+  placeholderAvatar: {
+    backgroundColor: '#ccc',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  customButton: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+  avatarText: {
+    fontSize: 32,
+    color: '#fff',
+  },
+  logoutButton: {
+    marginTop: 20,
+    marginHorizontal: 20,
+    padding: 15,
     backgroundColor: '#FF6347',
-    justifyContent: 'center',
+    borderRadius: 8,
     alignItems: 'center',
   },
-  shadow: {
-    shadowColor: '#7F5DF0',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.5,
-    elevation: 5,
+  logoutText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

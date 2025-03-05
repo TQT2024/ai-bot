@@ -11,34 +11,27 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
+import { useChatStore } from '../store/chatStore';
 
 const AddScreen = () => {
   const navigation = useNavigation();
-  const [messages, setMessages] = useState([
-    { id: '1', text: 'Welcome! How can I help you?', sender: 'bot' },
-  ]);
+  const { messages, sendUserMessage, clearChat } = useChatStore();
   const [message, setMessage] = useState('');
 
   // Hàm gửi tin nhắn
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (message.trim() === '') return;
 
-    // Thêm tin nhắn của người dùng vào danh sách
-    const userMessage = { id: Date.now().toString(), text: message, sender: 'user' };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    // Gửi tin nhắn của người dùng và nhận phản hồi từ chatbot
+    await sendUserMessage(message);
 
     // Xóa nội dung ô nhập tin nhắn
     setMessage('');
+  };
 
-    // Chat Bot phản hồi tự động
-    setTimeout(() => {
-      const botMessage = {
-        id: Date.now().toString(),
-        text: 'This is a bot reply!',
-        sender: 'bot',
-      };
-      setMessages((prevMessages) => [...prevMessages, botMessage]);
-    }, 1000);
+  // Hàm xóa tin nhắn
+  const handleClearChat = () => {
+    clearChat();
   };
 
   return (
@@ -47,6 +40,12 @@ const AddScreen = () => {
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Icon name="arrow-left" size={20} color="#000" />
         <Text style={styles.backText}>Quay lại</Text>
+      </TouchableOpacity>
+
+      {/* Nút xóa chat */}
+      <TouchableOpacity style={styles.clearButton} onPress={handleClearChat}>
+        <Icon name="trash" size={20} color="#000" />
+        <Text style={styles.clearText}>Xóa chat</Text>
       </TouchableOpacity>
 
       {/* Khung trò chuyện */}
@@ -112,6 +111,22 @@ const styles = StyleSheet.create({
     boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
   },
   backText: {
+    marginLeft: 10,
+    color: '#000',
+    fontSize: 16,
+  },
+  clearButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 50,
+    elevation: 5,
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+  },
+  clearText: {
     marginLeft: 10,
     color: '#000',
     fontSize: 16,

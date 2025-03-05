@@ -43,10 +43,7 @@ const CalendarScreen = () => {
     endOfWeek.setDate(startOfWeek.getDate() + 6);
     endOfWeek.setHours(23, 59, 59, 999);
 
-    console.log('Fetching events between:', {
-        start: startOfWeek.toISOString(),
-        end: endOfWeek.toISOString()
-      });
+  
 
     const weekEvents = getEventsByDateRange(startOfWeek, endOfWeek);
     setVisibleEvents(weekEvents);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,16 +18,21 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 
 type AdminScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AdminScreen'> &
-    DrawerNavigationProp<RootStackParamList>;
+  DrawerNavigationProp<RootStackParamList>;
 
 const ManagePost = () => {
   const navigation = useNavigation<AdminScreenNavigationProp>();
-  const { posts, addPost } = usePostStore();
+  const { posts, addPost, loadPosts } = usePostStore();
   const [modalVisible, setModalVisible] = useState(false);
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
   const [imageUri, setImageUri] = useState('');
   const [icon, setIcon] = useState('');
+
+  // Tải danh sách post khi component được mount
+  useEffect(() => {
+    loadPosts();
+  }, []);
 
   const handleAddCourse = () => {
     if (title && url && imageUri && icon) {
@@ -46,9 +51,10 @@ const ManagePost = () => {
   const renderItem = ({ item }: { item: Post }) => (
     <TouchableOpacity
       style={styles.courseCard}
-      onPress={() =>
-        navigation.navigate('PostDetailScreen', { postId: item.id })
-      }
+      onPress={() => {
+        navigation.navigate('PostDetailScreen', { postId: item.id });
+        
+      }}
     >
       <Image source={{ uri: item.imageUri }} style={styles.courseImage} />
       <Text style={styles.courseTitle}>{item.title}</Text>
@@ -57,12 +63,12 @@ const ManagePost = () => {
 
   return (
     <View style={styles.container}>
-        <View style={styles.header}>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.backButtonText}> Back</Text>
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Quản lý Post</Text>
-        </View>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.backButtonText}> Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Quản lý Post</Text>
+      </View>
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}

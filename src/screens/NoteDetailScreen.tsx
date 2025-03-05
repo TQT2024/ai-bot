@@ -4,6 +4,7 @@ import { useNoteStore } from '../store/noteStore';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
+import { auth } from '../../firebaseconfig';
 
 const NoteDetailScreen: React.FC<DrawerContentComponentProps> = (props) => {
   const route = useRoute();
@@ -16,7 +17,6 @@ const NoteDetailScreen: React.FC<DrawerContentComponentProps> = (props) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(note?.title || '');
   const [content, setContent] = useState(note?.content || '');
-
   const handleSave = () => {
     if (note) {
       updateNote({

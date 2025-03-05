@@ -1,4 +1,5 @@
 export interface CalendarEvent {
+    userId: string | undefined;
     id: string;
     title: string;
     startDate: string;

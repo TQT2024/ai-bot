@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useAuthStore } from '../store/authStore';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import {  useAuthStore } from '../store/authStore';
 import { useNavigation } from '@react-navigation/native';
-import { useUserStore } from '../store/storeUser';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { RootStackParamList } from '../navigation/AppNavigator';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
-import LogInGoogle from './logingoogle';
-
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { RootStackParamList } from '../navigation/AppNavigator';
+import {app} from '../../firebaseconfig';
+import { checkAdminPrivileges, grantAdminPrivileges } from '../store/firebaseServiec';
 type AuthStackNavigationProp = DrawerNavigationProp<RootStackParamList, 'AuthStack'>;
 
 const DangNhap = () => {
@@ -15,23 +14,33 @@ const DangNhap = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const login = useAuthStore((state) => state.login);
-  const users = useUserStore((state) => state.users);
+  const handleLogin = async () => {
+    try {
+      const auth = getAuth(app);
+      signInWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
+          // Signed in 
+          const user = userCredential.user;
+          const isAdmin = await checkAdminPrivileges(user.uid);
+          if(isAdmin === true)
+          {
+            login('admin');
+          }
+          else
+          login('user');
 
-  const handleLogin = () => {
-    if (email.toLowerCase() === 'admin@gmail.com' && password === 'admin') {
-      login('admin');
-      navigation.navigate('AdminScreen');
-      return;
-    }
-    const foundUser = users.find(
-      (user) =>
-        user.email.toLowerCase() === email.toLowerCase() &&
-        user.password === password
-    );
-    if (foundUser) {
-      login('user');
-    } else {
-      alert('Thông tin đăng nhập không chính xác');
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+        });
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert("Lỗi đăng nhập", error.message);
+        console.error(error.message);
+      } else {
+        Alert.alert("Lỗi đăng nhập", "An unknown error occurred");
+      }
     }
   };
 
@@ -50,24 +59,16 @@ const DangNhap = () => {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-
       <TextInput
         style={styles.input}
         placeholder="Mật khẩu"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry={true}
+        secureTextEntry
       />
-
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Đăng nhập</Text>
       </TouchableOpacity>
-
-      {/* <TouchableOpacity style={styles.googleButton} onPress={signInWithGoogle}>
-        <Icon name="google" size={18} color="#CC0000" />
-        <Text style={styles.buttonText3}>Đăng nhập bằng Google</Text>
-      </TouchableOpacity> */}
-    <LogInGoogle />
       <View style={styles.linkContainer}>
         <TouchableOpacity onPress={handleNavigateToRegister}>
           <Text style={styles.linkText}>Đăng ký tài khoản</Text>
@@ -111,45 +112,14 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 13,
     fontWeight: "bold",
-    textAlign: 'center',
-  },
-  buttonText2: {
-    color: "#333",
-    fontSize: 13,
-    fontWeight: "bold",
-    textAlign: 'center',
-  },
-  buttonText3: {
-    color: "#4267B2",
-    fontSize: 13,
-    fontWeight: "bold",
-    textAlign: 'center',
   },
   linkContainer: {
     alignItems: "center",
-    marginBottom: 0,
+    marginTop: 10,
   },
   linkText: {
     color: "#0066cc",
     fontSize: 15,
-    marginTop: 5,
-  },
-  googleButton: {
-    flexDirection: "row",
-    backgroundColor: "#f2f2f2",
-    padding: 10,
-    borderRadius: 10,
-    marginTop: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    borderColor: "#DB4437",
-  },
-  facebookButton: {
-    flexDirection: "row",
-    backgroundColor: "#f2f2f2",
-    padding: 11,
-    borderRadius: 10,
-    alignItems: "center",
   },
 });
 
