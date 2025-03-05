@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import {  useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../store/authStore';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { RootStackParamList } from '../navigation/AppNavigator';
-import {app} from '../../firebaseconfig';
-import { checkAdminPrivileges, grantAdminPrivileges } from '../store/firebaseServiec';
+import { app } from '../../firebaseconfig';
+import { checkAdminPrivileges } from '../store/firebaseServiec';
+
 type AuthStackNavigationProp = DrawerNavigationProp<RootStackParamList, 'AuthStack'>;
 
 const DangNhap = () => {
@@ -14,6 +15,7 @@ const DangNhap = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const login = useAuthStore((state) => state.login);
+
   const handleLogin = async () => {
     try {
       const auth = getAuth(app);
@@ -22,17 +24,16 @@ const DangNhap = () => {
           // Signed in 
           const user = userCredential.user;
           const isAdmin = await checkAdminPrivileges(user.uid);
-          if(isAdmin === true)
-          {
+          if (isAdmin === true) {
             login('admin');
+          } else {
+            login('user');
           }
-          else
-          login('user');
-
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
+          Alert.alert("Lỗi đăng nhập", errorMessage);
         });
     } catch (error) {
       if (error instanceof Error) {
@@ -46,6 +47,11 @@ const DangNhap = () => {
 
   const handleNavigateToRegister = () => {
     navigation.navigate('DangKy');
+  };
+
+  const handleNavigateToForgotPassword = () => {
+    // navigation.navigate('AuthStack', { screen: 'QuenMatKhau' });
+    navigation.navigate('QuenMatKhau');
   };
 
   return (
@@ -72,6 +78,9 @@ const DangNhap = () => {
       <View style={styles.linkContainer}>
         <TouchableOpacity onPress={handleNavigateToRegister}>
           <Text style={styles.linkText}>Đăng ký tài khoản</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleNavigateToForgotPassword}>
+          <Text style={styles.linkText}>Quên mật khẩu?</Text>
         </TouchableOpacity>
       </View>
     </View>

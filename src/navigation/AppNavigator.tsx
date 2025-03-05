@@ -23,6 +23,7 @@ import AdminScreen from '../screens/AdminScreen';
 import ManageUsers from '../screens/ManageUser';
 import ManagePost from '../screens/ManagePost';
 import PostDetailScreen from '../screens/PostDetailScreen';
+import QuenMatKhau from '../screens/ForgotPasswordScreen';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -36,7 +37,7 @@ export type RootStackParamList = {
     screen: 'NotesListScreen' | 'NoteDetailScreen';
   };
   AuthStack: {
-    screen: 'DangNhap' | 'DangKy' | 'AdminScreen';
+    screen: 'DangNhap' | 'DangKy' | 'AdminScreen' | 'QuenMatKhau';
   }
   AdminStack: {
     screen: 'AdminScreen' | 'ManageUsers' | 'ManagePost' | 'PostDetailScreen';
@@ -55,6 +56,7 @@ export type RootStackParamList = {
   CourseDetailScreen: { title: string; url: string };
   DangNhap: undefined;
   DangKy: undefined;
+  QuenMatKhau: undefined;
   AdminScreen: undefined;
   ManageUsers: undefined;
   ManagePost: undefined;
@@ -132,6 +134,11 @@ const AuthStack = () => (
       name="AdminScreen"
       component={AdminScreen}
       options={{ headerShown: false, title: 'Admin' }}
+    />
+    <Stack.Screen
+      name="QuenMatKhau"
+      component={QuenMatKhau}
+      options={{ headerShown: false }}
     />
   </Stack.Navigator>
 );
