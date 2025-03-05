@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useAuthStore } from '../store/authStore';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { app } from '../../firebaseconfig';
 import { checkAdminPrivileges } from '../store/firebaseServiec';
@@ -15,6 +15,22 @@ const DangNhap = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const login = useAuthStore((state) => state.login);
+
+  useEffect(() => {
+    const auth = getAuth(app);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const isAdmin = await checkAdminPrivileges(user.uid);
+        if (isAdmin === true) {
+          login('admin');
+        } else {
+          login('user');
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [login]);
 
   const handleLogin = async () => {
     try {
@@ -50,7 +66,6 @@ const DangNhap = () => {
   };
 
   const handleNavigateToForgotPassword = () => {
-    // navigation.navigate('AuthStack', { screen: 'QuenMatKhau' });
     navigation.navigate('QuenMatKhau');
   };
 
