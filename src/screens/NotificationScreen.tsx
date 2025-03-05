@@ -1,19 +1,63 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
+import * as MailComposer from 'expo-mail-composer';
 
 type ChatScreenProps = StackScreenProps<RootStackParamList, 'ChatScreen'>;
 
 const ChatScreen = ({ navigation }: ChatScreenProps) => {
+  const [message, setMessage] = useState('');
+
+  const sendEmail = async () => {
+    if (!message.trim()) {
+      Alert.alert('Lỗi', 'Vui lòng nhập nội dung phản hồi.');
+      return;
+    }
+
+    const isAvailable = await MailComposer.isAvailableAsync();
+    if (isAvailable) {
+      await MailComposer.composeAsync({
+        recipients: ['hophuoc4so9@gmail.com'],
+        subject: 'Phản hồi từ ứng dụng',
+        body: message,
+      });
+      Alert.alert('Thành công', 'Phản hồi của bạn đã được gửi.');
+      setMessage('');
+    } else {
+      Alert.alert('Lỗi', 'Thiết bị không hỗ trợ gửi email.');
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.username}>Trường đại học Thủ Dầu Một</Text>
       </View>
-      
 
+      <View style={styles.container}>
+        <Text style={styles.title}>Liên hệ</Text>
+        
+        <View style={styles.infoContainer}>
+          <Text style={styles.infoText}>Thông tin liên hệ:</Text>
+          <Text style={styles.infoText}>Email: chatbottdmu@gmail.com</Text>
+          <Text style={styles.infoText}>SDT: 09999999</Text>
+        </View>
+
+        <Text style={styles.label}>Phản hồi:</Text>
+        <TextInput
+          style={styles.textbox}
+          placeholder="Nhập phản hồi của bạn..."
+          multiline
+          value={message}
+          onChangeText={setMessage}
+        />
+
+        <TouchableOpacity style={styles.button} onPress={sendEmail}>
+          <Text style={styles.buttonText}>Gửi</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };
@@ -106,6 +150,48 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.5,
     elevation: 5,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  infoContainer: {
+    marginBottom: 20,
+    padding: 15,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+  },
+  infoText: {
+    fontSize: 18,
+    marginBottom: 5,
+  },
+  label: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  textbox: {
+    height: 100,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
+    marginBottom: 15,
+    textAlignVertical: 'top',
+  },
+  button: {
+    backgroundColor: '#007bff',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 
