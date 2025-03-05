@@ -34,27 +34,37 @@ const useCalendarStore = create<CalendarStore>((set, get) => ({
   // Tải các sự kiện của người dùng hiện tại
   fetchEvents: async () => {
     const userId = auth.currentUser?.uid;
-    if (!userId) return;
-
+    if (!userId) {
+      console.warn("Không có userId, không fetch events.");
+      return;
+    }
     set({ isLoading: true, error: null });
+    
     try {
       const q = query(
         collection(db, 'events'),
         where('userId', '==', userId)
       );
+      
       const querySnapshot = await getDocs(q);
-      const events: CalendarEvent[] = querySnapshot.docs.map((docSnap) => ({
-        id: docSnap.id,
-        ...docSnap.data(),
-      })) as CalendarEvent[];
+      
+      const events: CalendarEvent[] = querySnapshot.docs.map((docSnap) => {
+        const data = docSnap.data();
+        return {
+          id: docSnap.id,
+          ...data,
+        } as CalendarEvent;
+      });
       set({ events, isLoading: false });
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Error fetching events', 
-        isLoading: false 
+      console.error("fetchEvents: Error", error);
+      set({
+        error: error instanceof Error ? error.message : 'Error fetching events',
+        isLoading: false,
       });
     }
   },
+  
 
   // Thêm sự kiện mới cho người dùng hiện tại
   addEvent: async (eventData) => {

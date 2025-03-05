@@ -7,11 +7,14 @@ import * as Notifications from 'expo-notifications';
 import AppNavigator from './src/navigation/AppNavigator';
 import { auth } from './firebaseconfig';
 import { useAuthStore } from './src/store/authStore';
+import { useChatStore } from './src/store/chatStore';
+import useCalendarStore from './src/store/calendarStore';
 
 export default function App() {
   const [fontLoaded, setFontLoaded] = useState(false);
   const loadNotes = useNoteStore((state) => state.loadNotes);
   const { logout }= useAuthStore();
+  const {isLoggedIn}=useAuthStore();
   useEffect(() => {
     async function loadFont() {
       await Font.loadAsync({
@@ -20,14 +23,19 @@ export default function App() {
       setFontLoaded(true);
     }
     loadFont();
-    loadNotes();
     Notifications.requestPermissionsAsync();
   }, []);
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (!user) {
+      if (!user && isLoggedIn) {
         logout()
         Alert.alert('Phiên hết hạn', 'Phiên đã hết hạn. Xin hãy đăng nhập lại lần nữa.');
+      }
+      if(user)
+      {
+        useChatStore.getState().fetchMessages();
+        loadNotes();
+
       }
     });
     return unsubscribe;

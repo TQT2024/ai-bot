@@ -21,7 +21,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const handleLogout = async () => {
     try {
       await auth.signOut();
-      logout();
     } catch (error) {
       Alert.alert('Lỗi', 'Đã xảy ra lỗi khi đăng xuất');
     }
@@ -54,7 +53,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         )}
       </View>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+      <TouchableOpacity style={styles.logoutButton} onPress={() => { logout(); handleLogout(); }}>
         <Text style={styles.logoutText}>Đăng xuất</Text>
       </TouchableOpacity>
     </ScrollView>

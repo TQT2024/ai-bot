@@ -95,7 +95,7 @@ const ManageUsers = () => {
 
       <FlatList
         data={users}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => item.id || index.toString()}
         renderItem={renderItem}
         ListEmptyComponent={<Text style={styles.emptyText}>Chưa có user nào</Text>}
       />

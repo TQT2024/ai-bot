@@ -33,7 +33,7 @@ const NotesListScreen: React.FC = () => {
       </View>
       <FlatList
         data={notes}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item,index) => item.id || index.toString()}  
         renderItem={({ item }) => (
           <TouchableOpacity 
             onPress={ () => navigation.navigate('NoteDetailScreen', { noteId: item.id }) }

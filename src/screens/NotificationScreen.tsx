@@ -13,29 +13,7 @@ const ChatScreen = ({ navigation }: ChatScreenProps) => {
         <Text style={styles.username}>Trường đại học Thủ Dầu Một</Text>
       </View>
       
-      <View style={styles.cardContainer}>
-        <TouchableOpacity 
-          style={[styles.card, { backgroundColor: '#FFB74D' }]}
-          onPress={() => navigation.navigate('ChatScreen')}
-        >
-          <Icon name="plane" size={30} color="#fff" />
-          <Text style={styles.cardText}>Tìm chuyến bay</Text>
-        </TouchableOpacity>
-      </View>
 
-      <View style={styles.promotionContainer}>
-        <Text style={styles.promotionTitle}>Ưu đãi hiện hành</Text>
-        <TouchableOpacity style={styles.promotionCard}>
-          <Text style={styles.promotionText}>Xem tất cả khuyến mãi</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.footer}>
-        <Text style={styles.footerTitle}>Ưu đãi về máy</Text>
-        <TouchableOpacity style={styles.footerCard}>
-          <Text style={styles.footerText}>Sản phẩm, vé, thuê xe</Text>
-        </TouchableOpacity>
-      </View>
     </ScrollView>
   );
 };

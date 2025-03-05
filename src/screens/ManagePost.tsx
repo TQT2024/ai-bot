@@ -71,7 +71,7 @@ const ManagePost = () => {
       </View>
       <FlatList
         data={posts}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => item.id || index.toString()}
         renderItem={renderItem}
         ListEmptyComponent={
           <Text style={styles.emptyText}>Chưa có course nào</Text>

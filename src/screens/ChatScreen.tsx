@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
@@ -15,21 +16,25 @@ import { useChatStore } from '../store/chatStore';
 
 const AddScreen = () => {
   const navigation = useNavigation();
-  const { messages, sendUserMessage, clearChat } = useChatStore();
+  const { messages, sendUserMessage, clearChat, isLoading, fetchMessages } = useChatStore();
   const [message, setMessage] = useState('');
+  const flatListRef = useRef<FlatList>(null);
+
+  useEffect(() => {
+    fetchMessages().then(() => {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    });
+  }, []);
 
   // Hàm gửi tin nhắn
   const sendMessage = async () => {
     if (message.trim() === '') return;
-
-    // Gửi tin nhắn của người dùng và nhận phản hồi từ chatbot
     await sendUserMessage(message);
-
-    // Xóa nội dung ô nhập tin nhắn
     setMessage('');
+    flatListRef.current?.scrollToEnd({ animated: true });
   };
 
-  // Hàm xóa tin nhắn
+  // Hàm xóa chat
   const handleClearChat = () => {
     clearChat();
   };
@@ -51,8 +56,9 @@ const AddScreen = () => {
       {/* Khung trò chuyện */}
       <View style={styles.chatContainer}>
         <FlatList
+          ref={flatListRef}
           data={messages}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => item.id || index.toString()}
           renderItem={({ item }) => (
             <View
               style={[
@@ -85,9 +91,14 @@ const AddScreen = () => {
           placeholderTextColor="#aaa"
           value={message}
           onChangeText={setMessage}
+          editable={!isLoading}
         />
-        <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-          <Icon name="send" size={20} color="#fff" />
+        <TouchableOpacity style={styles.sendButton} onPress={sendMessage} disabled={isLoading}>
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Icon name="send" size={20} color="#fff" />
+          )}
         </TouchableOpacity>
       </KeyboardAvoidingView>
     </View>
@@ -108,7 +119,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 50,
     elevation: 5,
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
   },
   backText: {
     marginLeft: 10,
@@ -124,7 +134,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 50,
     elevation: 5,
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
   },
   clearText: {
     marginLeft: 10,

@@ -85,7 +85,7 @@ const AddScreen = () => {
         <Text style={styles.modalTitle}></Text>
         <FlatList
           data={combinedData}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item,index) => item.id || index.toString()}
           renderItem={({ item }) => (
             <View style={styles.noteItem}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

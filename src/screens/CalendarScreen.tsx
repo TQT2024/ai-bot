@@ -27,14 +27,14 @@ const { width, height } = Dimensions.get('window');
 
 const CalendarScreen = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const { events, getEventsByDateRange } = useCalendarStore();
+  const { events, getEventsByDateRange ,         fetchEvents  } = useCalendarStore();
   const [visibleEvents, setVisibleEvents] = useState<CalendarEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
-    console.log('All events from store:', events);
+    fetchEvents();
     const startOfWeek = new Date(currentDate);
     startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
     startOfWeek.setHours(0, 0, 0, 0);
@@ -59,7 +59,6 @@ const CalendarScreen = () => {
     const minutes = currentTime.getMinutes();
     return hours * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT + DAY_HEADER_HEIGHT;
   };
-  
 
   const generateTimeSlots = () => {
     return Array.from({ length: 24 }, (_, i) => 
