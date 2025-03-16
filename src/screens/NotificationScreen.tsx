@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { StackScreenProps } from '@react-navigation/stack';
 import * as MailComposer from 'expo-mail-composer';
+import { ThemeContext } from '../context/ThemeContext';
 
 type ChatScreenProps = StackScreenProps<RootStackParamList, 'ChatScreen'>;
 
 const ChatScreen = ({ navigation }: ChatScreenProps) => {
   const [message, setMessage] = useState('');
+  const { backgroundColor } = useContext(ThemeContext);
 
   const sendEmail = async () => {
     if (!message.trim()) {
@@ -31,7 +33,7 @@ const ChatScreen = ({ navigation }: ChatScreenProps) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor}]}>
       <View style={styles.header}>
         <Text style={styles.username}>Trường đại học Thủ Dầu Một</Text>
       </View>
@@ -65,10 +67,11 @@ const ChatScreen = ({ navigation }: ChatScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f2f2f2',
+    // backgroundColor: '#f2f2f2',
   },
   header: {
     padding: 20,
+    marginTop: 60,
     backgroundColor: '#3F51B5',
     alignItems: 'center',
   },
@@ -160,7 +163,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     marginBottom: 20,
     padding: 15,
-    backgroundColor: '#f0f0f0',
+    // backgroundColor: '#f0f0f0',
     borderRadius: 8,
   },
   infoText: {
@@ -171,13 +174,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
+    margin: 10
   },
   textbox: {
     height: 100,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: 'gray',
     borderRadius: 8,
     padding: 10,
+    margin: 10,
     fontSize: 16,
     marginBottom: 15,
     textAlignVertical: 'top',
@@ -187,6 +192,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
+    margin: 10,
   },
   buttonText: {
     fontSize: 18,

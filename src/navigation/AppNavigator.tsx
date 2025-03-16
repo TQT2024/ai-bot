@@ -24,6 +24,8 @@ import ManageUsers from '../screens/ManageUser';
 import ManagePost from '../screens/ManagePost';
 import PostDetailScreen from '../screens/PostDetailScreen';
 import QuenMatKhau from '../screens/ForgotPasswordScreen';
+import ContactScreen from '../screens/ContactScreen';
+import FAQDetail from '../components/FAQitem';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -31,7 +33,7 @@ export type RootStackParamList = {
 
   HomeStack: {
     screen: 'Home' | 'Settings' | 'Add' | 'Notifications' | 'Profile' | 'ChatScreen' |
-     'AddNoteDrawer' | 'AddCalendarDrawer' | 'NotesListScreen' | 'CourseDetailScreen';
+     'AddNoteDrawer' | 'AddCalendarDrawer' | 'NotesListScreen' | 'CourseDetailScreen' | 'ContactScreen' | 'FAQDetail';
   };
   NoteStack: {
     screen: 'NotesListScreen' | 'NoteDetailScreen';
@@ -61,6 +63,8 @@ export type RootStackParamList = {
   ManageUsers: undefined;
   ManagePost: undefined;
   PostDetailScreen: { postId: string };
+  ContactScreen: undefined;
+  FAQDetail: { category: string; question: string; answer: string };
 };
 
 const HomeStack = () => (
@@ -78,10 +82,16 @@ const HomeStack = () => (
           headerShown: false
         }}
       />
-      <Stack.Screen name="Settings" component={SettingsScreen} options={{ headerShown: false}}/>
+      <Stack.Screen name="Settings" component={SettingsScreen} 
+        options={{ headerShown: false}}
+      />
       <Stack.Screen name="Add" component={AddScreen} />
-      <Stack.Screen name="Notifications" component={NotificationScreen} />
-      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="Notifications" component={NotificationScreen} 
+        options={{headerShown: false}}
+      />
+      <Stack.Screen name="Profile" component={ProfileScreen} 
+        options={{headerShown: false}} 
+      />
       <Stack.Screen 
         name="ChatScreen"
         component={ChatScreen}
@@ -111,6 +121,22 @@ const HomeStack = () => (
         component={CourseDetailScreen}
         options={{
           title: 'News Detail',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="ContactScreen"
+        component={ContactScreen}
+        options={{
+          title: 'Contact',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="FAQDetail"
+        component={FAQDetail}
+        options={{
+          title: 'FAQ Detail',
           headerShown: false,
         }}
       />

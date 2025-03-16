@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -8,76 +8,124 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useUserStore, User } from '../store/storeUser';
+import {
+  loadUsersFromFirebase,
+  addUserToFirebase,
+  updateUserInFirebase,
+  deleteUserFromFirebase,
+  FirebaseUser,
+} from '../store/firebaseService';
 
 const ManageUsers = () => {
-  const { users, addUser, updateUser, deleteUser } = useUserStore();
   const navigation = useNavigation();
-  
+  const [users, setUsers] = useState<FirebaseUser[]>([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingUser, setEditingUser] = useState<FirebaseUser | null>(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [editingUserId, setEditingUserId] = useState<string | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const handleAddUser = () => {
+  const loadUsers = async () => {
+    try {
+      const loadedUsers = await loadUsersFromFirebase();
+      setUsers(loadedUsers);
+    } catch (error) {
+      console.error("Error loading users:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadUsers();
+    setRefreshing(false);
+  };
+
+  const resetForm = () => {
+    setEditingUser(null);
+    setName('');
+    setEmail('');
+    setPassword('');
+  };
+
+  const handleAddUser = async () => {
     if (name && email && password) {
-      addUser({ name, email, password });
-      resetForm();
-      setModalVisible(false);
+      try {
+        await addUserToFirebase({ name, email, password, isAdmin: false });
+        resetForm();
+        setModalVisible(false);
+        loadUsers();
+      } catch (error) {
+        console.error("Error adding user:", error);
+        Alert.alert('Lỗi', 'Không thể thêm user');
+      }
     } else {
       Alert.alert('Thông báo', 'Vui lòng điền đầy đủ thông tin');
     }
   };
 
-  const handleUpdateUser = () => {
-    if (editingUserId) {
-      updateUser(editingUserId, { name, email, password });
-      resetForm();
-      setModalVisible(false);
+  const handleUpdateUser = async () => {
+    if (editingUser) {
+      try {
+        await updateUserInFirebase(editingUser.id!, { name, email, password, isAdmin: false });
+        resetForm();
+        setModalVisible(false);
+        loadUsers();
+      } catch (error) {
+        console.error("Error updating user:", error);
+        Alert.alert('Lỗi', 'Không thể cập nhật user');
+      }
     }
   };
 
-  const handleEdit = (user: User) => {
-    setEditingUserId(user.id);
+  const handleDeleteUser = async (userId: string) => {
+    Alert.alert(
+      'Xác nhận',
+      'Bạn có chắc chắn muốn xoá user này không?',
+      [
+        { text: 'Không', style: 'cancel' },
+        {
+          text: 'Có', onPress: async () => {
+            try {
+              await deleteUserFromFirebase(userId);
+              loadUsers();
+            } catch (error) {
+              console.error("Error deleting user:", error);
+              Alert.alert('Lỗi', 'Không thể xoá user');
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const handleEditUser = (user: FirebaseUser) => {
+    setEditingUser(user);
     setName(user.name);
     setEmail(user.email);
     setPassword(user.password);
     setModalVisible(true);
   };
 
-  const handleDelete = (id: string) => {
-    Alert.alert(
-      'Xác nhận',
-      'Bạn có chắc chắn muốn xoá user này không?',
-      [
-        { text: 'Không', style: 'cancel' },
-        { text: 'Có', onPress: () => deleteUser(id) },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  const resetForm = () => {
-    setEditingUserId(null);
-    setName('');
-    setEmail('');
-    setPassword('');
-  };
-
-  const renderItem = ({ item }: { item: User }) => (
+  const renderItem = ({ item }: { item: FirebaseUser }) => (
     <View style={styles.userItem}>
       <View style={styles.userInfo}>
         <Text style={styles.userText}>{item.name}</Text>
         <Text style={styles.userText}>{item.email}</Text>
       </View>
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.editButton} onPress={() => handleEdit(item)}>
+        <TouchableOpacity style={styles.editButton} onPress={() => handleEditUser(item)}>
           <Text style={styles.buttonText}>Sửa</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
+        <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteUser(item.id!)}>
           <Text style={styles.buttonText}>Xoá</Text>
         </TouchableOpacity>
       </View>
@@ -95,8 +143,12 @@ const ManageUsers = () => {
 
       <FlatList
         data={users}
-        keyExtractor={(item, index) => item.id || index.toString()}
+        keyExtractor={(item) => item.id!}
         renderItem={renderItem}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        contentContainerStyle={{ flexGrow: 1 }}
         ListEmptyComponent={<Text style={styles.emptyText}>Chưa có user nào</Text>}
       />
 
@@ -119,7 +171,7 @@ const ManageUsers = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>
-              {editingUserId ? 'Cập nhật User' : 'Thêm User'}
+              {editingUser ? 'Cập nhật User' : 'Thêm User'}
             </Text>
             <TextInput
               placeholder="Tên"
@@ -141,7 +193,7 @@ const ManageUsers = () => {
               style={styles.input}
               secureTextEntry
             />
-            {editingUserId ? (
+            {editingUser ? (
               <TouchableOpacity style={styles.button} onPress={handleUpdateUser}>
                 <Text style={styles.buttonText}>Cập nhật User</Text>
               </TouchableOpacity>

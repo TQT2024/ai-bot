@@ -1,15 +1,17 @@
 // screens/ProfileScreen.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Image } from 'react-native';
 import { auth } from '../../firebaseconfig';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../types/types';
 import { useAuthStore } from '../store/authStore';
+import { ThemeContext } from '../context/ThemeContext';
 
 type ProfileScreenProps = StackScreenProps<RootStackParamList, 'ProfileScreen'>;
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [currentUser, setCurrentUser] = useState(auth.currentUser);
+  const { backgroundColor } = useContext(ThemeContext);
   const {logout }= useAuthStore();
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
@@ -27,7 +29,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor}]}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Thông tin cá nhân</Text>
         {currentUser ? (
@@ -63,15 +65,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f2f2f2',
   },
   header: {
-    padding: 20,
-    backgroundColor: '#3F51B5',
+    padding: 40,
+    marginTop: 40,
     alignItems: 'center',
   },
   headerTitle: {
-    color: '#fff',
+    color: 'black',
     fontSize: 22,
     fontWeight: 'bold',
   },
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   infoText: {
-    color: '#fff',
+    color: 'black',
     fontSize: 16,
     marginVertical: 4,
   },
@@ -94,6 +95,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 2,
+    elevation: 10,
   },
   avatarText: {
     fontSize: 32,

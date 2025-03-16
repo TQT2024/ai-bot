@@ -12,6 +12,7 @@ import useCalendarStore from '../store/calendarStore';
 import { CalendarEvent } from '../types/calendar';
 import EventDetailModal from '../components/EventDetailModal';
 
+
 const HOUR_HEIGHT = 60;
 const TIME_LABEL_WIDTH = 50;
 const DAY_HEADER_HEIGHT = 50;

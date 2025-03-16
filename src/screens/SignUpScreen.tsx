@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -12,14 +12,16 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { auth } from '../../firebaseconfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { addUserToFirebase } from '../store/firebaseService';
 
 type AuthStackNavigationProp = DrawerNavigationProp<RootStackParamList, 'AuthStack'>;
 
 const DangKy = () => {
   const navigation = useNavigation<AuthStackNavigationProp>();
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [confirmPassword, setConfirmPassword] = React.useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleRegister = async () => {
     if (password !== confirmPassword) {
@@ -30,18 +32,23 @@ const DangKy = () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+      await addUserToFirebase({ name, email, password, isAdmin: false });
       Alert.alert('Success', 'User registered successfully');
       navigation.navigate('DangNhap');
-    } catch (error) {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      Alert.alert('Error', errorMessage);
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
     }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Đăng ký</Text>
+      
+      <TextInput
+        style={styles.input}
+        placeholder="Tên"
+        onChangeText={(text) => setName(text)}
+      />
 
       <TextInput
         style={styles.input}

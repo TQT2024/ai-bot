@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
@@ -9,6 +9,7 @@ import { useNoteStore } from '../store/noteStore';
 import useCalendarStore from '../store/calendarStore';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { auth } from '../../firebaseconfig';
+import { ThemeContext } from '../context/ThemeContext';
 
 type AddScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddScreen'> & 
   DrawerNavigationProp<RootStackParamList>;
@@ -19,6 +20,7 @@ const AddScreen = () => {
   const events = useCalendarStore((state) => state.events);
   const clearNotes = useNoteStore((state) => state.clearNotes);
   const clearEvents = useCalendarStore((state) => state.clearEvents);
+  const { backgroundColor } = useContext(ThemeContext);
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
@@ -62,7 +64,7 @@ const AddScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor }]}>
       <View style={styles.topSection}>
         <TouchableOpacity
           style={[styles.card, { backgroundColor: '#0171C6' }]}
@@ -103,13 +105,12 @@ const AddScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: 'transparent',
   },
   topSection: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#f2f2f2',
     paddingVertical: 20,
   },
   card: {
