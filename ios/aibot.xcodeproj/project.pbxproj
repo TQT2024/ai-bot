@@ -16,6 +16,8 @@
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		E6625831933E4A90A8210265 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A87F0F9963C4A92B94F6749 /* noop-file.swift */; };
 		FD1C93C12428FCE876850778 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 40EE52D10F6D6D1A79806BEA /* PrivacyInfo.xcprivacy */; };
+		52D7D63DF49D4A3198627E61 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 46E51A8167D040CD99B85606 /* GoogleService-Info.plist */; };
+		4003773DB0E141B5B6538DE7 /* mixkit-long-pop-2358.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2111AFEA8E3A432EB20BB344 /* mixkit-long-pop-2358.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +36,9 @@
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-aibot/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		46E51A8167D040CD99B85606 /* GoogleService-Info.plist */ = {isa = PBXFileReference; name = "GoogleService-Info.plist"; path = "aibot/GoogleService-Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; explicitFileType = undefined; includeInIndex = 0; };
+		85F7B085DF194852AC2878A1 /* aibot-Bridging-Header.h */ = {isa = PBXFileReference; name = "aibot-Bridging-Header.h"; path = "aibot/aibot-Bridging-Header.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
+		2111AFEA8E3A432EB20BB344 /* mixkit-long-pop-2358.wav */ = {isa = PBXFileReference; name = "mixkit-long-pop-2358.wav"; path = "aibot/mixkit-long-pop-2358.wav"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +65,9 @@
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
 				9A87F0F9963C4A92B94F6749 /* noop-file.swift */,
 				40EE52D10F6D6D1A79806BEA /* PrivacyInfo.xcprivacy */,
+				46E51A8167D040CD99B85606 /* GoogleService-Info.plist */,
+				85F7B085DF194852AC2878A1 /* aibot-Bridging-Header.h */,
+				2111AFEA8E3A432EB20BB344 /* mixkit-long-pop-2358.wav */,
 			);
 			name = aibot;
 			sourceTree = "<group>";
@@ -201,6 +209,9 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				FD1C93C12428FCE876850778 /* PrivacyInfo.xcprivacy in Resources */,
+				52D7D63DF49D4A3198627E61 /* GoogleService-Info.plist in Resources */,
+				428E90A066504D4DADA98D84 /* aibot-Bridging-Header.h in Resources */,
+				4003773DB0E141B5B6538DE7 /* mixkit-long-pop-2358.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,11 +377,13 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.anhtuatus.aibot;
-				PRODUCT_NAME = aibot;
+				PRODUCT_NAME = "aibot";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
+				SWIFT_OBJC_BRIDGING_HEADER = aibot/aibot-Bridging-Header.h;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "arm64";
 			};
 			name = Debug;
 		};
@@ -393,10 +406,12 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.anhtuatus.aibot;
-				PRODUCT_NAME = aibot;
+				PRODUCT_NAME = "aibot";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
+				SWIFT_OBJC_BRIDGING_HEADER = aibot/aibot-Bridging-Header.h;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "arm64";
 			};
 			name = Release;
 		};

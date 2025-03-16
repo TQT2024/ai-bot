@@ -7,7 +7,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { useAuthStore } from '../store/authStore';
 import { auth } from '../../firebaseconfig';
-import { seedCoursesToPosts } from '../store/postStore';
+// import { seedCoursesToPosts } from '../store/postStore';
 
 type AdminScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AdminScreen'> &
   DrawerNavigationProp<RootStackParamList>;
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f2f2f2',
     paddingTop: 86,
-    justifyContent: 'space-between', // đảm bảo các phần tử được phân chia đều, nút đăng xuất hiển thị ở dưới cùng
+    justifyContent: 'space-between',
   },
   Section: {
     flexDirection: 'row',

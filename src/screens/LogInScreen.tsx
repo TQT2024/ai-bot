@@ -22,9 +22,9 @@ const DangNhap = () => {
       if (user) {
         const isAdmin = await checkAdminPrivileges(user.uid);
         if (isAdmin === true) {
-          login('admin');
+          login('admin', user.uid);
         } else {
-          login('user');
+          login('user', user.uid);
         }
       }
     });
@@ -33,33 +33,43 @@ const DangNhap = () => {
   }, [login]);
 
   const handleLogin = async () => {
-    try {
-      const auth = getAuth(app);
-      signInWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
-          // Signed in 
-          const user = userCredential.user;
-          const isAdmin = await checkAdminPrivileges(user.uid);
-          if (isAdmin === true) {
-            login('admin');
-          } else {
-            login('user');
-          }
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          Alert.alert("Lỗi đăng nhập", errorMessage);
-        });
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert("Lỗi đăng nhập", error.message);
-        console.error(error.message);
-      } else {
-        Alert.alert("Lỗi đăng nhập", "An unknown error occurred");
-      }
+    const studentEmailRegex = /^(admin|[0-9]+)@tdmu\.edu\.vn$/;
+    if (!studentEmailRegex.test(email)) {
+      Alert.alert(
+        "Lỗi đăng nhập",
+        "Chỉ được đăng nhập bằng tài khoản sinh viên của Trường"
+      );
+      return;
     }
+  
+    try {
+    const auth = getAuth(app);
+    signInWithEmailAndPassword(auth, email, password)
+      .then(async (userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+        const isAdmin = await checkAdminPrivileges(user.uid);
+        if (isAdmin === true) {
+          login('admin', user.uid);
+          navigation.navigate('AdminScreen');
+        } else {
+          login('user', user.uid);
+        }
+      })
+      .catch((error) => {
+        const errorMessage = error.message;
+        Alert.alert("Lỗi đăng nhập", errorMessage);
+      });
+  } catch (error) {
+    if (error instanceof Error) {
+      Alert.alert("Lỗi đăng nhập", error.message);
+      console.error(error.message);
+    } else {
+      Alert.alert("Lỗi đăng nhập", "An unknown error occurred");
+    }
+  }
   };
+  
 
   const handleNavigateToRegister = () => {
     navigation.navigate('DangKy');
