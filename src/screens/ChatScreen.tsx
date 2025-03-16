@@ -9,12 +9,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import { useChatStore } from '../store/chatStore';
 
-const AddScreen = () => {
+const ChatScreen = () => {
   const navigation = useNavigation();
   const { messages, sendUserMessage, clearChat, isLoading, fetchMessages } = useChatStore();
   const [message, setMessage] = useState('');
@@ -26,7 +27,6 @@ const AddScreen = () => {
     });
   }, []);
 
-  // Hàm gửi tin nhắn
   const sendMessage = async () => {
     if (message.trim() === '') return;
     await sendUserMessage(message);
@@ -34,53 +34,66 @@ const AddScreen = () => {
     flatListRef.current?.scrollToEnd({ animated: true });
   };
 
-  // Hàm xóa chat
   const handleClearChat = () => {
     clearChat();
   };
 
+  // Hàm render tin nhắn với xử lý link
+  const renderMessageItem = ({ item }: { item: any }) => {
+    if (item.sender === 'chatbot' && item.text.includes("Tài liệu liên quan:")) {
+      const parts = item.text.split("\n\nTài liệu liên quan:");
+      const mainText = parts[0];
+      const linkText = parts[1].trim();
+      return (
+        <View style={[styles.message, styles.botMessage]}>
+          <Text style={[styles.messageText, styles.botText]}>{mainText}</Text>
+          <TouchableOpacity onPress={() => Linking.openURL(linkText)}>
+            <Text style={styles.linkText}>Xem tài liệu liên quan</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    return (
+      <View
+        style={[
+          styles.message,
+          item.sender === 'user' ? styles.userMessage : styles.botMessage,
+        ]}
+      >
+        <Text
+          style={[
+            styles.messageText,
+            item.sender === 'user' ? styles.userText : styles.botText,
+          ]}
+        >
+          {item.text}
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      {/* Nút quay lại */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Icon name="arrow-left" size={20} color="#000" />
         <Text style={styles.backText}>Quay lại</Text>
       </TouchableOpacity>
 
-      {/* Nút xóa chat */}
       <TouchableOpacity style={styles.clearButton} onPress={handleClearChat}>
         <Icon name="trash" size={20} color="#000" />
         <Text style={styles.clearText}>Xóa chat</Text>
       </TouchableOpacity>
 
-      {/* Khung trò chuyện */}
       <View style={styles.chatContainer}>
         <FlatList
           ref={flatListRef}
           data={messages}
           keyExtractor={(item, index) => item.id || index.toString()}
-          renderItem={({ item }) => (
-            <View
-              style={[
-                styles.message,
-                item.sender === 'user' ? styles.userMessage : styles.botMessage,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.messageText,
-                  item.sender === 'user' ? styles.userText : styles.botText,
-                ]}
-              >
-                {item.text}
-              </Text>
-            </View>
-          )}
+          renderItem={renderMessageItem}
           contentContainerStyle={styles.chatContent}
         />
       </View>
 
-      {/* Khung nhập tin nhắn */}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.inputContainer}
@@ -175,6 +188,12 @@ const styles = StyleSheet.create({
   botText: {
     color: '#333',
   },
+  linkText: {
+    color: '#0000EE',
+    textDecorationLine: 'underline',
+    marginTop: 5,
+    fontSize: 14,
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -202,4 +221,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddScreen;
+export default ChatScreen;
+

@@ -11,6 +11,7 @@ import {
   getDoc,
 } from 'firebase/firestore';
 import { auth, db } from '../../firebaseconfig';
+import faqsData from '../data/qna_data.json';
 
 export type ChatMessage = {
   id: string;
@@ -30,45 +31,50 @@ type ChatStore = {
   clearChat: () => Promise<void>;
 };
 
-const API_URL = 'https://ef0c-34-83-37-205.ngrok-free.app';
+const API_URL = 'https://4724-34-83-211-175.ngrok-free.app';
 const CHATS_COLLECTION = 'chats';
 const CHAT_STATUS_COLLECTION = 'chatStatus';
+
+function getFAQAnswer(userQuestion: string): { answer: string; url?: string } | null {
+  const faqs = faqsData.faqs;
+  const lowerUserQuestion = userQuestion.trim().toLowerCase();
+  const faq = faqs.find(item => item.Question.trim().toLowerCase() === lowerUserQuestion);
+  if (faq) {
+    const answer = faq.Answer;
+    const rawUrl = faq["url (link pdf, nội dung liên quan đến)"];
+    const trimmedUrl: string | undefined = typeof rawUrl === "string" ? rawUrl.trim() : undefined;
+    return { answer, url: trimmedUrl };
+  }
+  return null;
+}
+
 
 export const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
   isLoading: false,
   error: null,
 
-  // Thêm tin nhắn vào store (nội bộ)
   addMessage: (message: ChatMessage) =>
     set((state) => ({ messages: [...state.messages, message] })),
 
-  // Xóa chat: cập nhật Firestore với thời điểm xóa và reset store
   clearChat: async () => {
     const currentUser = auth.currentUser;
     if (!currentUser) return;
     const uid = currentUser.uid;
     const currentTime = Date.now();
     try {
-      // Lưu thời điểm xóa chat
       await setDoc(doc(db, CHAT_STATUS_COLLECTION, uid), { lastCleared: currentTime });
-      // Reset tin nhắn trong store
       set({ messages: [] });
     } catch (error) {
       console.error("Error clearing chat:", error);
-      set({
-        error: error instanceof Error ? error.message : "Error clearing chat",
-      });
+      set({ error: error instanceof Error ? error.message : "Error clearing chat" });
     }
   },
 
-  // Lấy tin nhắn: chỉ lấy tin nhắn có timestamp > lastCleared (nếu có)
   fetchMessages: async () => {
     const currentUser = auth.currentUser;
     if (!currentUser) return;
     const uid = currentUser.uid;
-
-    // Lấy thông tin chatStatus để xác định thời điểm xóa chat
     let lastCleared = 0;
     try {
       const chatStatusDoc = await getDoc(doc(db, CHAT_STATUS_COLLECTION, uid));
@@ -78,12 +84,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     } catch (error) {
       console.error("Error fetching chat status:", error);
     }
-
-    // Reset dữ liệu tin nhắn trước khi fetch
     set({ messages: [], isLoading: true, error: null });
-
     try {
-      // Xây dựng truy vấn: lấy tin nhắn của người dùng, nếu có lastCleared thì chỉ lấy các tin sau thời điểm đó
       let messagesQuery;
       if (lastCleared) {
         messagesQuery = query(
@@ -99,7 +101,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
           orderBy('timestamp', 'asc')
         );
       }
-
       const querySnapshot = await getDocs(messagesQuery);
       const messages: ChatMessage[] = querySnapshot.docs.map((docSnap) => ({
         id: docSnap.id,
@@ -115,15 +116,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
   },
 
-  // Gửi tin nhắn của người dùng và nhận phản hồi từ chatbot
   sendUserMessage: async (text: string) => {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
     set({ isLoading: true, error: null });
-
-    // Tạo tin nhắn của người dùng
     const userMsg: ChatMessage = {
-      id: '', // Sẽ cập nhật sau khi thêm vào Firestore
+      id: '',
       sender: 'user',
       text,
       timestamp: Date.now(),
@@ -131,27 +129,31 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     };
 
     try {
-      // Thêm tin nhắn của người dùng vào Firestore
       const docRefUser = await addDoc(collection(db, CHATS_COLLECTION), userMsg);
       const userMsgWithId: ChatMessage = { ...userMsg, id: docRefUser.id };
-      set((state) => ({
-        messages: [...state.messages, userMsgWithId],
-      }));
+      set((state) => ({ messages: [...state.messages, userMsgWithId] }));
 
-      // Gọi API để lấy phản hồi từ chatbot
-      const response = await fetch(API_URL + '/query', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: text }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get chatbot response');
+      // Check question trong file JSON FAQs
+      const faqResult = getFAQAnswer(text);
+      let chatbotText: string;
+      if (faqResult) {
+        chatbotText = faqResult.answer;
+        if (faqResult.url) {
+          chatbotText += "\n\nTài liệu liên quan: " + faqResult.url;
+        }
+      } else {
+        const response = await fetch(API_URL + '/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: text }),
+        });
+        if (!response.ok) {
+          throw new Error('Failed to get chatbot response');
+        }
+        const data = await response.json();
+        chatbotText = data.answer;
       }
-      const data = await response.json();
-      const chatbotText: string = data.answer;
 
-      // Tạo tin nhắn của chatbot
       const botMsg: ChatMessage = {
         id: '',
         sender: 'chatbot',
@@ -174,3 +176,4 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
   },
 }));
+

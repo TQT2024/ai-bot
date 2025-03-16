@@ -33,8 +33,9 @@ const DangNhap = () => {
   }, [login]);
 
   const handleLogin = async () => {
-    const studentEmailRegex = /^(admin|[0-9]+)@tdmu\.edu\.vn$/;
-    if (!studentEmailRegex.test(email)) {
+    const studentEmailRegex = /^[0-9]+@student\.tdmu\.edu\.vn$/;
+    const adminEmailRegex = /^[a-zA-Z0-9]+@admin\.tdmu\.edu\.vn$/;
+    if (!studentEmailRegex.test(email) && !adminEmailRegex.test(email)) {
       Alert.alert(
         "Lỗi đăng nhập",
         "Chỉ được đăng nhập bằng tài khoản sinh viên của Trường"

@@ -11,6 +11,8 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { auth } from '../../firebaseconfig';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import {
   loadUsersFromFirebase,
   addUserToFirebase,
@@ -58,10 +60,13 @@ const ManageUsers = () => {
   const handleAddUser = async () => {
     if (name && email && password) {
       try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
         await addUserToFirebase({ name, email, password, isAdmin: false });
         resetForm();
         setModalVisible(false);
         loadUsers();
+        Alert.alert('Thông báo', 'Thêm user thành công');
       } catch (error) {
         console.error("Error adding user:", error);
         Alert.alert('Lỗi', 'Không thể thêm user');
